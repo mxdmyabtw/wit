@@ -145,7 +145,7 @@
         <div class="top-bar-right">
           <a href="/boutique" class="coins-display">
             <img src="/images/coin.png" alt="" class="coin-icon">
-            <span id="coins">1000</span>
+            <span id="coins">0</span>
           </a>
           <div id="auth-area"></div>
         </div>
@@ -155,12 +155,15 @@
           <button class="modal-close" type="button">&times;</button>
           <h2>Profil</h2>
           <div class="profile-header">
-            <img class="profile-pdp" alt="avatar">
+            <div class="profile-pdp-wrap" title="Cliquer pour changer">
+              <img class="profile-pdp" alt="avatar">
+              <input type="file" accept="image/*" style="display:none">
+            </div>
             <div class="profile-info">
               <div class="profile-pseudo">-</div>
               <div class="profile-links">
-                <button type="button" class="btn-link-epic">Epic Games</button>
-                <button type="button" class="btn-link-discord">Discord</button>
+                <button type="button" class="btn-link-epic"><span class="btn-icon btn-icon-epic" aria-hidden="true"></span>Epic Games</button>
+                <button type="button" class="btn-link-discord"><span class="btn-icon btn-icon-discord" aria-hidden="true"></span>Discord</button>
                 <button type="button" class="btn-logout">Deconnexion</button>
               </div>
             </div>
@@ -288,17 +291,17 @@
     </div>
   </div>
 
+  <script src="/config-discord.js"></script>
+  <script src="/auth.js"></script>
+  <script src="/boutique-payment.js"></script>
+  <script src="/header-init.js"></script>
   <script>
-    const STORAGE_KEY = 'wit-coins';
     const MATCHES_KEY = 'wit-matches';
     const ACTIVE_KEY = 'wit-active-matches';
     const CHAT_KEY = 'wit-chat-';
 
-    const getCoins = () => parseFloat(localStorage.getItem(STORAGE_KEY) || '1000');
-    const setCoins = (n) => {
-      localStorage.setItem(STORAGE_KEY, String(n));
-      document.getElementById('coins').textContent = n.toLocaleString('fr-FR', { minimumFractionDigits: 1 });
-    };
+    const getCoins = () => (window.WitBoutiquePayment && window.WitBoutiquePayment.getCoins ? window.WitBoutiquePayment.getCoins() : 0);
+    const setCoins = (n) => { if (window.WitBoutiquePayment && window.WitBoutiquePayment.setCoins) window.WitBoutiquePayment.setCoins(n); };
     const getMatches = () => JSON.parse(localStorage.getItem(MATCHES_KEY) || '[]');
     const setMatches = (m) => localStorage.setItem(MATCHES_KEY, JSON.stringify(m));
     const getActive = () => JSON.parse(localStorage.getItem(ACTIVE_KEY) || '[]');
@@ -339,6 +342,7 @@
           </div>
         `;
         card.querySelector('[data-join]').addEventListener('click', () => {
+          requireLoginAndThen(function() {
           const amt = parseAmount(m.amount);
           if (getCoins() < amt) { alert('Pas assez de pieces.'); return; }
           setCoins(getCoins() - amt);
@@ -350,6 +354,7 @@
           setMatches(all);
           document.querySelector('.tab[data-tab="active"]').click();
           updateUI();
+          });
         });
         container.appendChild(card);
       });
@@ -400,7 +405,20 @@
       document.getElementById('active-matches').style.display = t.dataset.tab === 'active' ? 'grid' : 'none';
     }));
 
-    document.getElementById('btn-open-modal').addEventListener('click', () => document.getElementById('create-modal').classList.add('open'));
+    function requireLoginAndThen(cb) {
+      if (window.WitAuth && window.WitAuth.isLoggedIn && window.WitAuth.isLoggedIn()) {
+        if (typeof cb === 'function') cb();
+        return;
+      }
+      (window.WitAuth && window.WitAuth.login ? window.WitAuth.login() : Promise.resolve(null)).then(function(u) {
+        if (u && typeof cb === 'function') cb();
+        else if (!u) alert('Creer un compte ou te connecter pour continuer.');
+      });
+    }
+
+    document.getElementById('btn-open-modal').addEventListener('click', () => {
+      requireLoginAndThen(() => document.getElementById('create-modal').classList.add('open'));
+    });
     document.getElementById('modal-close').addEventListener('click', () => document.getElementById('create-modal').classList.remove('open'));
 
     document.querySelectorAll('.preset').forEach(b => b.addEventListener('click', () => {
@@ -411,6 +429,10 @@
 
     document.getElementById('create-form').addEventListener('submit', (e) => {
       e.preventDefault();
+      if (!(window.WitAuth && window.WitAuth.isLoggedIn && window.WitAuth.isLoggedIn())) {
+        alert('Connecte-toi pour creer un match.');
+        return;
+      }
       const form = e.target;
       const amount = parseAmount(form.querySelector('[name="amount-custom"]').value);
       if (amount < 0.5) { alert('Minimum 0.5 piece'); return; }
@@ -491,11 +513,5 @@
 
     updateUI();
   </script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
-  <script src="/config-firebase.js"></script>
-  <script src="/config-discord.js"></script>
-  <script src="/auth.js"></script>
-  <script src="/header-init.js"></script>
 </body>
 </html>

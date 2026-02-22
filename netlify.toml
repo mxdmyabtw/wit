@@ -3,3 +3,8 @@
   base = "static"
   publish = "."
   command = "echo 'Static site - no build'"
+
+# Fonctions serverless pour Stripe
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"

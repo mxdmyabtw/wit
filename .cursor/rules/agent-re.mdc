@@ -1,0 +1,15 @@
+---
+description: Quand l'utilisateur tape "re", résumer toutes les bulles (alert, confirm, prompt, modales)
+alwaysApply: true
+---
+
+# Commande "re"
+
+Quand l'utilisateur envoie **re** (ou **"re"**), fournir un résumé concis de toutes les bulles/popups présentes dans l'app :
+
+- `alert()`
+- `confirm()`
+- `prompt()`
+- Modales (modal-auth, modal-profile, modal-pseudo, etc.)
+
+Format : liste par fichier avec le contexte (action qui déclenche la bulle).

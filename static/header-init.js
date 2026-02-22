@@ -14,19 +14,25 @@
       area.innerHTML = '<button class="btn-login" id="btn-login">Se connecter</button>';
       var btn = document.getElementById('btn-login');
       if (btn) btn.addEventListener('click', function() {
-        (window.WitAuth && window.WitAuth.loginGoogle()).then(function(u) {
-          if (u) renderAuthArea();
+        (window.WitAuth && window.WitAuth.login()).then(function(u) {
+          if (u) {
+            renderAuthArea();
+            if (window.WitBoutiquePayment && window.WitBoutiquePayment.refreshCoins) window.WitBoutiquePayment.refreshCoins();
+          }
         });
       });
     }
   }
+
+  var defaultPdpSvg = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%2371717a%22%3E%3Cpath d=%22M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z%22/%3E%3C/svg%3E';
 
   function showProfile(user) {
     var m = document.getElementById('modal-profile');
     if (!m) return;
     var s = (window.WitAuth && window.WitAuth.getStats()) || {};
     m.querySelector('.profile-pseudo').textContent = user.pseudo || 'Inconnu';
-    m.querySelector('.profile-pdp').src = user.pdp || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%2371717a%22%3E%3Cpath d=%22M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z%22/%3E%3C/svg%3E';
+    var pdpImg = m.querySelector('.profile-pdp');
+    pdpImg.src = user.pdp || defaultPdpSvg;
     m.querySelector('.stat-total').textContent = (s.totalEarned || 0).toFixed(2);
     m.querySelector('.stat-wins').textContent = s.wins || 0;
     m.querySelector('.stat-losses').textContent = s.losses || 0;
@@ -37,6 +43,26 @@
     if (disc) { disc.classList.toggle('linked', !!user.discordLinked); disc.onclick = function() { (window.WitAuth && window.WitAuth.linkDiscord()); }; }
     var logoutBtn = m.querySelector('.btn-logout');
     if (logoutBtn) logoutBtn.onclick = function() { (window.WitAuth && window.WitAuth.logout()); closeProfileModal(); renderAuthArea(); window.location.reload(); };
+    var pdpWrap = m.querySelector('.profile-pdp-wrap');
+    if (pdpWrap) {
+      var fileInput = pdpWrap.querySelector('input[type="file"]');
+      if (fileInput) {
+        pdpWrap.style.cursor = 'pointer';
+        pdpWrap.onclick = function() { fileInput.click(); };
+        fileInput.onchange = function() {
+          var f = fileInput.files && fileInput.files[0];
+          if (!f || !f.type.match(/^image\//)) return;
+          var r = new FileReader();
+          r.onload = function() {
+            if (window.WitAuth && window.WitAuth.updatePdp) window.WitAuth.updatePdp(r.result);
+            pdpImg.src = r.result;
+            renderAuthArea();
+          };
+          r.readAsDataURL(f);
+        };
+      }
+      pdpWrap.title = 'Cliquer pour changer la photo';
+    }
     m.classList.add('open');
   }
 
@@ -57,7 +83,12 @@
 
   function init() {
     if (window.WitAuth && window.WitAuth.onAuthStateChanged) {
-      window.WitAuth.onAuthStateChanged(renderAuthArea);
+      window.WitAuth.onAuthStateChanged(function() {
+        renderAuthArea();
+        if (window.WitBoutiquePayment && window.WitBoutiquePayment.refreshCoins) {
+          window.WitBoutiquePayment.refreshCoins();
+        }
+      });
     } else {
       renderAuthArea();
     }

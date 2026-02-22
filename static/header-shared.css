@@ -54,17 +54,17 @@
 }
 .modal-auth h2, .modal-profile h2 { font-size: 1.25rem; margin-bottom: 1rem; }
 .modal-auth p, .modal-profile p { color: #a1a1aa; font-size: 0.9rem; margin-bottom: 1rem; }
-.btn-google {
-  display: flex; align-items: center; justify-content: center; gap: 0.75rem; width: 100%; padding: 0.75rem 1rem;
-  background: #fff; color: #1a1a1a; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.95rem;
-}
-.btn-google:hover { background: #f0f0f0; }
-.btn-google svg { width: 20px; height: 20px; }
 .modal-close { float: right; background: none; border: none; color: #a1a1aa; font-size: 1.25rem; cursor: pointer; }
 
 /* Profile modal */
 .profile-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
-.profile-pdp { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; background: #27272a; }
+.profile-pdp-wrap {
+  position: relative; cursor: pointer; flex-shrink: 0;
+  width: 64px; height: 64px; border-radius: 50%; overflow: hidden;
+  border: 2px solid #3f3f46; transition: border-color 0.2s;
+}
+.profile-pdp-wrap:hover { border-color: #f59e0b; }
+.profile-pdp { width: 100%; height: 100%; object-fit: cover; background: #27272a; display: block; }
 .profile-info { flex: 1; }
 .profile-pseudo { font-size: 1.25rem; font-weight: 700; color: #f4f4f5; margin-bottom: 0.25rem; }
 .profile-links { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
@@ -72,6 +72,12 @@
   padding: 0.4rem 0.75rem; border-radius: 6px; font-size: 0.8rem; cursor: pointer; border: 1px solid #3f3f46;
   background: rgba(39, 39, 42, 0.8); color: #a1a1aa; display: flex; align-items: center; gap: 0.4rem;
 }
+.btn-icon { width: 18px; height: 18px; flex-shrink: 0; background-size: contain; background-repeat: no-repeat; background-position: center; }
+.btn-icon-discord { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235865F2'%3E%3Cpath d='M20.317 4.37a19.8 19.8 0 0 0-4.885-1.5.07.07 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.3 18.3 0 0 0-5.487 0 12.6 12.6 0 0 0-.617-1.25.08.08 0 0 0-.079-.037A19.7 19.7 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.08.08 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.08.08 0 0 0 .084-.028 14.1 14.1 0 0 0 1.226-1.994.08.08 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.08.08 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.07.07 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.07.07 0 0 1 .078.01c.12.098.246.198.373.292a.08.08 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.08.08 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.08.08 0 0 0 .084.028 19.8 19.8 0 0 0 6.002-3.03.08.08 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.06.06 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z'/%3E%3C/svg%3E"); }
+.btn-icon-epic { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23fff'%3E%3Cpath d='M8.56 12h6.88l-3.44 6h-3.44l1.72-3-1.72-3zm3.44-10L3 20h4l2-3.5 2 3.5h4L12 2zm0 5l1.5 2.5L15 7h-3z'/%3E%3C/svg%3E"); }
+.btn-link-epic .btn-icon-epic, .btn-link-discord .btn-icon-discord { opacity: 0.9; }
+.btn-link-epic:hover .btn-icon-epic, .btn-link-discord:hover .btn-icon-discord { opacity: 1; }
+.btn-link-epic.linked .btn-icon-epic, .btn-link-discord.linked .btn-icon-discord { filter: none; }
 .btn-link-epic:hover, .btn-link-discord:hover { border-color: #52525b; color: #f4f4f5; }
 .btn-link-epic.linked, .btn-link-discord.linked { border-color: #22c55e; color: #22c55e; }
 .btn-logout { border-color: #ef4444 !important; color: #ef4444 !important; }

@@ -93,7 +93,8 @@
     .bundle-card.red .chest-img { filter: hue-rotate(-35deg) saturate(1.2) drop-shadow(0 4px 12px rgba(239,68,68,0.2)); }
     .bundle-card.green .chest-img { filter: hue-rotate(85deg) saturate(1.25) drop-shadow(0 4px 12px rgba(34,197,94,0.2)); }
     .bundle-card.gold .chest-img { filter: hue-rotate(20deg) saturate(1.4) brightness(1.08) drop-shadow(0 4px 12px rgba(234,179,8,0.25)); }
-    .bundle-card .btn-buy { width: 100%; padding: 0.6rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.8rem; }
+    .bundle-price { font-size: 1rem; font-weight: 700; color: #a1a1aa; margin-bottom: 0.5rem; }
+.bundle-card .btn-buy { width: 100%; padding: 0.6rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.8rem; }
     .bundle-card.blue .btn-buy { background: #3b82f6; color: #fff; }
     .bundle-card.red .btn-buy { background: #ef4444; color: #fff; }
     .bundle-card.green .btn-buy { background: #22c55e; color: #fff; }
@@ -140,7 +141,7 @@
         <div class="top-bar-right">
           <a href="/boutique" class="coins-display">
             <img src="/images/coin.png" alt="" class="coin-icon">
-            <span id="coins">1000</span>
+            <span id="coins">0</span>
           </a>
           <div id="auth-area"></div>
         </div>
@@ -150,12 +151,15 @@
           <button class="modal-close" type="button">&times;</button>
           <h2>Profil</h2>
           <div class="profile-header">
-            <img class="profile-pdp" alt="avatar">
+            <div class="profile-pdp-wrap" title="Cliquer pour changer">
+              <img class="profile-pdp" alt="avatar">
+              <input type="file" accept="image/*" style="display:none">
+            </div>
             <div class="profile-info">
               <div class="profile-pseudo">-</div>
               <div class="profile-links">
-                <button type="button" class="btn-link-epic">Epic Games</button>
-                <button type="button" class="btn-link-discord">Discord</button>
+                <button type="button" class="btn-link-epic"><span class="btn-icon btn-icon-epic" aria-hidden="true"></span>Epic Games</button>
+                <button type="button" class="btn-link-discord"><span class="btn-icon btn-icon-discord" aria-hidden="true"></span>Discord</button>
                 <button type="button" class="btn-logout">Deconnexion</button>
               </div>
             </div>
@@ -192,16 +196,13 @@
   </main>
     </div>
   </div>
-  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
-  <script src="/config-firebase.js"></script>
   <script src="/config-discord.js"></script>
   <script src="/auth.js"></script>
   <script src="/header-init.js"></script>
   <script src="/gift-codes.js"></script>
+  <script src="/boutique-payment.js"></script>
   <script>
-    document.getElementById('coins').textContent = parseFloat(localStorage.getItem('wit-coins') || '1000').toLocaleString('fr-FR', {minimumFractionDigits:1});
-
+    const PRICES_EUR = { 5: '5', 10: '10', 15: '15', 20: '20', 25: '25', 50: '50', 100: '100' };
     const bundles = [
       { amount: 5, color: 'blue' },
       { amount: 10, color: 'red' },
@@ -212,10 +213,18 @@
       { amount: 100, color: 'gold' }
     ];
 
+    if (window.WitBoutiquePayment) {
+      window.WitBoutiquePayment.handlePaymentSuccess();
+      window.WitBoutiquePayment.initCoins();
+    } else {
+      document.getElementById('coins').textContent = parseFloat(localStorage.getItem('wit-coins') || '1000').toLocaleString('fr-FR', {minimumFractionDigits:1});
+    }
+
     const grid = document.getElementById('piece-grid');
     bundles.forEach(b => {
       const card = document.createElement('div');
       card.className = 'bundle-card ' + b.color;
+      const price = PRICES_EUR[b.amount] || '—';
       card.innerHTML = `
         <div class="bundle-label">
           <img src="/images/coin.png" alt="" class="coin-mini">
@@ -224,13 +233,21 @@
         <div class="chest-img-wrap">
           <img src="/images/chest.png" alt="" class="chest-img">
         </div>
-        <button class="btn-buy">${b.amount} ACHETER</button>
+        <div class="bundle-price">${price} €</div>
+        <button class="btn-buy" data-amount="${b.amount}">Payer par carte · ${price} €</button>
       `;
-      card.querySelector('.btn-buy').addEventListener('click', () => {
-        const c = parseFloat(localStorage.getItem('wit-coins') || '1000');
-        localStorage.setItem('wit-coins', String(c + b.amount));
-        document.getElementById('coins').textContent = (c + b.amount).toLocaleString('fr-FR', {minimumFractionDigits:1});
-        alert('+' + b.amount + ' pieces creditees !');
+      card.querySelector('.btn-buy').addEventListener('click', function(ev) {
+        if (!(window.WitBoutiquePayment && window.WitBoutiquePayment.isLoggedIn && window.WitBoutiquePayment.isLoggedIn())) {
+          (window.WitAuth && window.WitAuth.login ? window.WitAuth.login() : Promise.resolve(null)).then(function(u) {
+            if (u) { card.querySelector('.btn-buy').click(); }
+            else alert('Creer un compte ou te connecter pour acheter des pieces.');
+          });
+          return;
+        }
+        var amt = parseInt(this.getAttribute('data-amount'), 10);
+        if (window.WitBoutiquePayment && window.WitBoutiquePayment.payWithCard) {
+          window.WitBoutiquePayment.payWithCard(amt, ev);
+        }
       });
       grid.appendChild(card);
     });
@@ -243,23 +260,33 @@
     }));
 
     (function giftCode() {
-      const used = JSON.parse(localStorage.getItem('wit-used-codes') || '[]');
-      const btn = document.querySelector('.btn-gift');
-      const input = document.getElementById('gift-input');
-      btn.addEventListener('click', () => {
-        const raw = (input.value || '').trim().toUpperCase();
-        if (!raw) { alert('Entre un code.'); return; }
-        if (used.includes(raw)) { alert('Ce code a deja ete utilise.'); return; }
-        const found = (typeof GIFT_CODES !== 'undefined' ? GIFT_CODES : []).find(c => c.code.toUpperCase() === raw);
-        if (!found) { alert('Code invalide.'); return; }
+      var used = JSON.parse(localStorage.getItem('wit-used-codes') || '[]');
+      var btn = document.querySelector('.btn-gift');
+      var input = document.getElementById('gift-input');
+      btn.addEventListener('click', function() {
+        if (!(window.WitBoutiquePayment && window.WitBoutiquePayment.isLoggedIn && window.WitBoutiquePayment.isLoggedIn())) {
+          (window.WitAuth && window.WitAuth.login ? window.WitAuth.login() : Promise.resolve(null)).then(function(u) {
+            if (u) { btn.click(); }
+            else alert('Creer un compte ou te connecter pour utiliser un code cadeau.');
+          });
+          return;
+        }
+        var raw = (input.value || '').trim().toUpperCase();
+        if (!raw) { return; }
+        if (used.indexOf(raw) >= 0) { return; }
+        var list = typeof GIFT_CODES !== 'undefined' ? GIFT_CODES : [];
+        var found = null;
+        for (var i = 0; i < list.length; i++) {
+          if (list[i].code.toUpperCase() === raw) { found = list[i]; break; }
+        }
+        if (!found) { return; }
         used.push(raw);
         localStorage.setItem('wit-used-codes', JSON.stringify(used));
-        const c = parseFloat(localStorage.getItem('wit-coins') || '1000');
-        const newVal = c + found.amount;
-        localStorage.setItem('wit-coins', String(newVal));
-        document.getElementById('coins').textContent = newVal.toLocaleString('fr-FR', {minimumFractionDigits:1});
+        var c = (window.WitBoutiquePayment && window.WitBoutiquePayment.loadCoinsFromStorage) ? window.WitBoutiquePayment.loadCoinsFromStorage() : 0;
+        var newVal = c + found.amount;
+        if (window.WitBoutiquePayment && window.WitBoutiquePayment.saveCoinsToStorage) window.WitBoutiquePayment.saveCoinsToStorage(newVal);
+        else document.getElementById('coins').textContent = newVal.toLocaleString('fr-FR', { minimumFractionDigits: 1 });
         input.value = '';
-        alert('+' + found.amount + ' pieces creditees !');
       });
     })();
   </script>
