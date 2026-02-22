@@ -74,6 +74,8 @@
 }
 .btn-link-epic:hover, .btn-link-discord:hover { border-color: #52525b; color: #f4f4f5; }
 .btn-link-epic.linked, .btn-link-discord.linked { border-color: #22c55e; color: #22c55e; }
+.btn-logout { border-color: #ef4444 !important; color: #ef4444 !important; }
+.btn-logout:hover { background: rgba(239, 68, 68, 0.15) !important; }
 .profile-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem; }
 .profile-stat { padding: 0.75rem; background: rgba(39, 39, 42, 0.6); border-radius: 8px; border: 1px solid #27272a; }
 .profile-stat .label { font-size: 0.7rem; color: #71717a; margin-bottom: 0.25rem; }

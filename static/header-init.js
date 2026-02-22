@@ -11,22 +11,9 @@
       var dd = document.getElementById('user-dd');
       if (dd) dd.addEventListener('click', function() { showProfile(user); });
     } else {
-      area.innerHTML = '<div class="auth-btns"><button class="btn-register" id="btn-register">Register</button><button class="btn-login" id="btn-login">Login</button></div>';
-      var btnLogin = document.getElementById('btn-login');
-      var btnReg = document.getElementById('btn-register');
-      if (btnLogin) btnLogin.addEventListener('click', openAuthModal);
-      if (btnReg) btnReg.addEventListener('click', openAuthModal);
+      (window.WitAuth && window.WitAuth.loginGoogle()).then(function() { renderAuthArea(); });
+      area.innerHTML = '';
     }
-  }
-
-  function openAuthModal() {
-    var m = document.getElementById('modal-auth');
-    if (m) m.classList.add('open');
-  }
-
-  function closeAuthModal() {
-    var m = document.getElementById('modal-auth');
-    if (m) m.classList.remove('open');
   }
 
   function showProfile(user) {
@@ -43,6 +30,8 @@
     var disc = m.querySelector('.btn-link-discord');
     if (epic) { epic.classList.toggle('linked', !!user.epicLinked); epic.onclick = function() { (window.WitAuth && window.WitAuth.linkEpic()); }; }
     if (disc) { disc.classList.toggle('linked', !!user.discordLinked); disc.onclick = function() { (window.WitAuth && window.WitAuth.linkDiscord()); }; }
+    var logoutBtn = m.querySelector('.btn-logout');
+    if (logoutBtn) logoutBtn.onclick = function() { (window.WitAuth && window.WitAuth.logout()); closeProfileModal(); renderAuthArea(); window.location.reload(); };
     m.classList.add('open');
   }
 
@@ -69,19 +58,9 @@
     }
     var searchBtn = document.getElementById('search-btn');
     if (searchBtn) searchBtn.addEventListener('click', onSearch);
-    document.querySelectorAll('.modal-auth .modal-close').forEach(function(b) { b.onclick = closeAuthModal; });
     document.querySelectorAll('.modal-profile .modal-close').forEach(function(b) { b.onclick = closeProfileModal; });
-    var authOverlay = document.getElementById('modal-auth');
-    if (authOverlay) authOverlay.addEventListener('click', function(e) { if (e.target === authOverlay) closeAuthModal(); });
     var profileOverlay = document.getElementById('modal-profile');
     if (profileOverlay) profileOverlay.addEventListener('click', function(e) { if (e.target === profileOverlay) closeProfileModal(); });
-    var btnGoogle = document.getElementById('btn-google');
-    if (btnGoogle) {
-      btnGoogle.addEventListener('click', function() {
-        var u = window.WitAuth && window.WitAuth.loginGoogle();
-        if (u) { closeAuthModal(); renderAuthArea(); }
-      });
-    }
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

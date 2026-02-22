@@ -1,17 +1,61 @@
 /**
- * Auth & Profils - Simulation pour site statique
- * Pour une vraie implémentation: utiliser Firebase Auth (Google) + backend
- * ATTENTION: Le token Discord ne doit JAMAIS être dans le frontend - le bot tourne côté serveur
+ * Auth & Profils - Firebase Auth (Google) ou simulation
+ * Si WIT_FIREBASE_CONFIG est defini et valide, utilise Firebase Auth.
+ * Sinon fallback sur simulation pour dev.
+ * ATTENTION: Le token Discord ne doit JAMAIS etre dans le frontend - le bot tourne cote serveur
  */
 
 (function() {
   const STORAGE_USER = 'wit-user';
   const STORAGE_STATS = 'wit-match-stats';
 
+  let firebaseAuth = null;
+  let firebaseInitialized = false;
+
+  function initFirebase() {
+    if (firebaseInitialized) return firebaseAuth;
+    const cfg = typeof window !== 'undefined' && window.WIT_FIREBASE_CONFIG;
+    if (!cfg || !cfg.apiKey || cfg.apiKey === 'AIza...') return null;
+    if (typeof firebase === 'undefined') return null;
+    try {
+      if (!firebase.apps.length) firebase.initializeApp(cfg);
+      firebaseAuth = firebase.auth();
+      firebaseInitialized = true;
+      return firebaseAuth;
+    } catch (e) {
+      console.warn('Firebase init failed:', e);
+      return null;
+    }
+  }
+
+  function useFirebase() {
+    return !!initFirebase();
+  }
+
+  function firebaseUserToWitUser(fbUser) {
+    if (!fbUser) return null;
+    const email = fbUser.email || '';
+    const displayName = fbUser.displayName || email.split('@')[0] || 'Joueur';
+    const photoURL = fbUser.photoURL || null;
+    return {
+      id: fbUser.uid,
+      email: email,
+      pseudo: displayName.slice(0, 20),
+      pdp: photoURL,
+      epicLinked: false,
+      discordLinked: false
+    };
+  }
+
   function getUser() {
     try {
       return JSON.parse(localStorage.getItem(STORAGE_USER) || 'null');
     } catch (_) { return null; }
+  }
+
+  function setUser(u) {
+    if (u) localStorage.setItem(STORAGE_USER, JSON.stringify(u));
+    else localStorage.removeItem(STORAGE_USER);
   }
 
   function getStats() {
@@ -25,7 +69,7 @@
   }
 
   function initStats() {
-    let s = getStats();
+    var s = getStats();
     if (typeof s.totalEarned !== 'number') s.totalEarned = 0;
     if (typeof s.wins !== 'number') s.wins = 0;
     if (typeof s.losses !== 'number') s.losses = 0;
@@ -35,7 +79,7 @@
   }
 
   function addMatchResult(won, amount) {
-    const s = getStats();
+    var s = getStats();
     s.matchesPlayed = (s.matchesPlayed || 0) + 1;
     if (won) {
       s.wins = (s.wins || 0) + 1;
@@ -46,30 +90,57 @@
     saveStats(s);
   }
 
+  function loginGoogleSimulated() {
+    var pseudo = 'Invite_' + Math.random().toString(36).slice(2, 8);
+    var u = {
+      id: 'g_' + Date.now(),
+      email: '',
+      pseudo: pseudo,
+      pdp: null,
+      epicLinked: false,
+      discordLinked: false
+    };
+    setUser(u);
+    initStats();
+    return Promise.resolve(u);
+  }
+
+  function loginGoogle() {
+    return loginGoogleSimulated();
+  }
+
+  function logout() {
+    if (useFirebase()) {
+      var auth = initFirebase();
+      auth.signOut().catch(function() {});
+    }
+    setUser(null);
+  }
+
   window.WitAuth = {
-    getUser,
-    isLoggedIn: () => !!getUser(),
-    loginGoogle: function() {
-      var pseudo = prompt('Connexion avec Google simulee. Choisis ton pseudo :');
-      if (!pseudo || !pseudo.trim()) return null;
-      var u = {
-        id: 'g_' + Date.now(),
-        email: 'user@gmail.com',
-        pseudo: pseudo.trim().slice(0, 20),
-        pdp: null,
-        epicLinked: false,
-        discordLinked: false
-      };
-      localStorage.setItem(STORAGE_USER, JSON.stringify(u));
-      initStats();
-      return u;
+    getUser: getUser,
+    isLoggedIn: function() { return !!getUser(); },
+    loginGoogle: loginGoogle,
+    logout: logout,
+    getStats: getStats,
+    initStats: initStats,
+    addMatchResult: addMatchResult,
+    onAuthStateChanged: function(callback) {
+      if (useFirebase()) {
+        initFirebase().onAuthStateChanged(function(fbUser) {
+          if (fbUser) {
+            var u = firebaseUserToWitUser(fbUser);
+            setUser(u);
+            callback(u);
+          } else {
+            setUser(null);
+            callback(null);
+          }
+        });
+      } else {
+        callback(getUser());
+      }
     },
-    logout: function() {
-      localStorage.removeItem(STORAGE_USER);
-    },
-    getStats,
-    initStats,
-    addMatchResult,
     searchUser: function(pseudo) {
       var u = getUser();
       if (!u || !pseudo) return null;
@@ -85,4 +156,11 @@
       alert('Pour lier Discord :\n1. Va sur ton serveur Discord et utilise la commande de ton bot (ex: /link)\n2. Ou ouvre ce lien dans un nouvel onglet : ' + url + '\n\nLe token du bot ne doit JAMAIS etre dans le frontend - regenere-le si tu l\'as expose.');
     }
   };
+
+  if (useFirebase()) {
+    initFirebase().onAuthStateChanged(function(fbUser) {
+      if (fbUser) setUser(firebaseUserToWitUser(fbUser));
+      else setUser(null);
+    });
+  }
 })();
