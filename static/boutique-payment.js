@@ -18,6 +18,11 @@
     return id ? 'wit-coins-' + id : null;
   }
 
+  function getSnipesStorageKey() {
+    var id = getUserId();
+    return id ? 'wit-snipes-' + id : null;
+  }
+
   function getCoinsEl() {
     return document.getElementById('coins');
   }
@@ -30,12 +35,15 @@
   function loadCoinsFromStorage() {
     var key = getCoinsStorageKey();
     if (!key) return 0;
-    var val = parseFloat(localStorage.getItem(key) || '0');
-    if (val === 0 && localStorage.getItem(STORAGE_COINS_LEGACY)) {
-      val = parseFloat(localStorage.getItem(STORAGE_COINS_LEGACY) || '0');
+    var raw = localStorage.getItem(key);
+    if (raw === null && localStorage.getItem(STORAGE_COINS_LEGACY)) {
+      var val = parseFloat(localStorage.getItem(STORAGE_COINS_LEGACY) || '1000');
       localStorage.setItem(key, String(val));
       localStorage.removeItem(STORAGE_COINS_LEGACY);
+      return val;
     }
+    var val = parseFloat(raw || '1000');
+    if (raw === null) localStorage.setItem(key, '1000');
     return val;
   }
 
@@ -52,6 +60,60 @@
 
   function setCoins(val) {
     saveCoinsToStorage(val);
+  }
+
+  function getSnipesEl() {
+    return document.getElementById('snipes');
+  }
+
+  function loadSnipesFromStorage() {
+    var key = getSnipesStorageKey();
+    if (!key) return 0;
+    return parseInt(localStorage.getItem(key) || '0', 10);
+  }
+
+  function saveSnipesToStorage(val) {
+    var key = getSnipesStorageKey();
+    if (!key) return;
+    localStorage.setItem(key, String(Math.max(0, val)));
+    var el = getSnipesEl();
+    if (el) el.textContent = Math.max(0, val);
+  }
+
+  function getSnipes() {
+    return loadSnipesFromStorage();
+  }
+
+  function setSnipes(val) {
+    saveSnipesToStorage(val);
+  }
+
+  function useSnipe() {
+    var n = getSnipes();
+    if (n < 1) return false;
+    saveSnipesToStorage(n - 1);
+    return true;
+  }
+
+  function buySnipesWithCoins(amount, costInCoins) {
+    var coins = getCoins();
+    if (coins < costInCoins) return false;
+    setCoins(coins - costInCoins);
+    setSnipes(getSnipes() + amount);
+    return true;
+  }
+
+  function updateSnipesDisplay(val) {
+    var el = getSnipesEl();
+    if (el) el.textContent = Math.max(0, val || 0);
+  }
+
+  function initSnipes() {
+    updateSnipesDisplay(loadSnipesFromStorage());
+  }
+
+  function refreshSnipes() {
+    updateSnipesDisplay(loadSnipesFromStorage());
   }
 
   function handlePaymentSuccess() {
@@ -102,13 +164,19 @@
   window.WitBoutiquePayment = {
     payWithCard: payWithCard,
     initCoins: initCoins,
+    initSnipes: initSnipes,
     refreshCoins: refreshCoins,
+    refreshSnipes: refreshSnipes,
     handlePaymentSuccess: handlePaymentSuccess,
     loadCoinsFromStorage: loadCoinsFromStorage,
     saveCoinsToStorage: saveCoinsToStorage,
-    updateCoinsDisplay: updateCoinsDisplay,
     getCoins: getCoins,
     setCoins: setCoins,
+    getSnipes: getSnipes,
+    setSnipes: setSnipes,
+    useSnipe: useSnipe,
+    buySnipesWithCoins: buySnipesWithCoins,
+    updateSnipesDisplay: updateSnipesDisplay,
     getUserId: getUserId,
     isLoggedIn: function() { return !!getUserId(); }
   };

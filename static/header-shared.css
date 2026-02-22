@@ -6,14 +6,13 @@
   display: flex; align-items: center; justify-content: space-between; padding: 0 1rem; gap: 1rem; z-index: 99;
 }
 .top-bar-left { display: flex; align-items: center; gap: 1rem; flex: 1; min-width: 0; }
-.top-bar .top-logo { width: 36px; height: 36px; flex-shrink: 0; }
-.top-bar .top-logo img { width: 100%; height: 100%; object-fit: contain; }
 .search-wrap {
   display: flex; align-items: center; gap: 0.5rem; flex: 1; max-width: 280px;
   background: rgba(39, 39, 42, 0.8); border: 1px solid #3f3f46; border-radius: 8px; padding: 0.4rem 0.75rem;
 }
 .search-wrap:focus-within { border-color: #f59e0b; }
-.search-wrap .search-icon { color: #71717a; font-size: 1rem; }
+.search-wrap .search-icon { display: flex; align-items: center; flex-shrink: 0; }
+.search-wrap .search-icon img { width: 16px; height: 16px; object-fit: contain; opacity: 0.7; }
 .search-wrap input {
   flex: 1; border: none; background: transparent; color: #f4f4f5; font-size: 0.9rem; outline: none;
 }
@@ -27,6 +26,12 @@
 .coins-display:hover { background: rgba(245, 158, 11, 0.15); }
 .coins-display .coin-icon { width: 24px; height: 24px; object-fit: contain; }
 .coins-display span { font-weight: 700; color: #f59e0b; font-size: 0.95rem; }
+.snipes-display {
+  display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem;
+  background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px;
+  font-size: 0.95rem; font-weight: 700; color: #ef4444;
+}
+.snipes-display .snipe-icon { width: 20px; height: 20px; opacity: 0.9; }
 .auth-btns { display: flex; gap: 0.5rem; }
 .btn-register, .btn-login {
   padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem; border: none;
@@ -67,6 +72,16 @@
 .profile-pdp { width: 100%; height: 100%; object-fit: cover; background: #27272a; display: block; }
 .profile-info { flex: 1; }
 .profile-pseudo { font-size: 1.25rem; font-weight: 700; color: #f4f4f5; margin-bottom: 0.25rem; }
+.profile-pseudo-edit { display: flex; gap: 0.5rem; margin: 0.5rem 0; }
+.profile-pseudo-edit input {
+  flex: 1; padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid #3f3f46;
+  background: rgba(39, 39, 42, 0.9); color: #f4f4f5; font-size: 0.9rem;
+}
+.profile-pseudo-edit button {
+  padding: 0.4rem 0.75rem; border-radius: 6px; border: none;
+  background: #2563eb; color: #fff; font-weight: 600; cursor: pointer; font-size: 0.85rem;
+}
+.profile-pseudo-edit button:hover { background: #3b82f6; }
 .profile-links { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
 .btn-link-epic, .btn-link-discord {
   padding: 0.4rem 0.75rem; border-radius: 6px; font-size: 0.8rem; cursor: pointer; border: 1px solid #3f3f46;
@@ -86,6 +101,10 @@
 .profile-stat { padding: 0.75rem; background: rgba(39, 39, 42, 0.6); border-radius: 8px; border: 1px solid #27272a; }
 .profile-stat .label { font-size: 0.7rem; color: #71717a; margin-bottom: 0.25rem; }
 .profile-stat .value { font-size: 1.1rem; font-weight: 700; color: #f59e0b; }
+/* Profil en lecture seule (view opponent) */
+.modal-profile.read-only .profile-pseudo-edit,
+.modal-profile.read-only .profile-links { display: none !important; }
+.modal-profile.read-only .profile-pdp-wrap { cursor: default; pointer-events: none; }
 
 /* Modal Pseudo - centre ecran */
 .modal-pseudo {
@@ -119,3 +138,22 @@
   font-weight: 700; font-size: 1rem; cursor: pointer; transition: opacity 0.2s;
 }
 .modal-pseudo-form button:hover { opacity: 0.9; }
+
+/* Footer */
+.footer-wrap {
+  margin-top: 3rem; padding: 2rem 0; border-top: 1px solid #27272a; text-align: center;
+}
+.footer-wrap .footer-logo { display: inline-flex; flex-direction: column; align-items: center; text-decoration: none; color: #f59e0b; margin-bottom: 1rem; }
+.footer-wrap .footer-logo:hover { color: #fcd34d; }
+.footer-social { display: flex; justify-content: center; gap: 0.75rem; margin-bottom: 1rem; }
+.footer-social a {
+  width: 36px; height: 36px; border-radius: 50%; background: #27272a;
+  display: flex; align-items: center; justify-content: center;
+  color: #a1a1aa; text-decoration: none; transition: all 0.2s;
+}
+.footer-social a:hover { background: #5865F2; color: #fff; }
+.footer-social a svg { width: 18px; height: 18px; }
+.footer-nav { display: flex; justify-content: center; gap: 1.25rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
+.footer-nav a { color: #a1a1aa; text-decoration: none; font-size: 0.9rem; }
+.footer-nav a:hover { color: #f59e0b; }
+.footer-wrap .footer-copy { font-size: 0.75rem; color: #52525b; margin-top: 0.5rem; }

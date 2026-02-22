@@ -136,9 +136,8 @@
     <div class="main-wrap">
       <div class="top-bar">
         <div class="top-bar-left">
-          <a href="/" class="top-logo"><img src="/images/logo-noir.png" alt="WIT"></a>
           <div class="search-wrap">
-            <span class="search-icon">&#128269;</span>
+            <span class="search-icon"><img src="/images/search.svg" alt="" aria-hidden="true"></span>
             <input type="text" id="search-input" placeholder="Search username...">
           </div>
         </div>
@@ -147,6 +146,10 @@
             <img src="/images/coin.png" alt="" class="coin-icon">
             <span id="coins">0</span>
           </a>
+          <span class="snipes-display" title="Snipes pour voir un adversaire avant le match">
+            <svg class="snipe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            <span id="snipes">0</span>
+          </span>
           <div id="auth-area"></div>
         </div>
       </div>
@@ -161,6 +164,10 @@
             </div>
             <div class="profile-info">
               <div class="profile-pseudo">-</div>
+              <div class="profile-pseudo-edit">
+                <input type="text" id="profile-pseudo-input" placeholder="Changer pseudo" maxlength="20">
+                <button type="button" id="profile-pseudo-btn">Valider</button>
+              </div>
               <div class="profile-links">
                 <button type="button" class="btn-link-epic"><span class="btn-icon btn-icon-epic" aria-hidden="true"></span>Epic Games</button>
                 <button type="button" class="btn-link-discord"><span class="btn-icon btn-icon-discord" aria-hidden="true"></span>Discord</button>
@@ -291,6 +298,22 @@
     </div>
   </div>
 
+  <footer class="footer-wrap">
+    <a href="/" class="footer-logo font-heading"><span class="logo-title">Win is Key</span><span class="logo-wit">WIT</span></a>
+    <div class="footer-social">
+      <a href="https://discord.gg/nPvsqw7JSc" target="_blank" rel="noopener" title="Rejoindre notre Discord">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.8 19.8 0 0 0-4.885-1.5.07.07 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.3 18.3 0 0 0-5.487 0 12.6 12.6 0 0 0-.617-1.25.08.08 0 0 0-.079-.037A19.7 19.7 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.08.08 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.08.08 0 0 0 .084-.028 14.1 14.1 0 0 0 1.226-1.994.08.08 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.08.08 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.07.07 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.07.07 0 0 1 .078.01c.12.098.246.198.373.292a.08.08 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.08.08 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.08.08 0 0 0 .084.028 19.8 19.8 0 0 0 6.002-3.03.08.08 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.06.06 0 0 0-.031-.03z"/></svg>
+      </a>
+    </div>
+    <nav class="footer-nav">
+      <a href="/">Home</a>
+      <a href="/matches">Matches</a>
+      <a href="/tournois">Tournaments</a>
+      <a href="/boutique">Shop</a>
+    </nav>
+    <p class="footer-copy">© 2025 Win is Key</p>
+  </footer>
+
   <script src="/config-discord.js"></script>
   <script src="/config-firebase.js"></script>
   <script src="/auth.js"></script>
@@ -317,6 +340,7 @@
 
     function updateUI() {
       document.getElementById('coins').textContent = getCoins().toLocaleString('en-US', { minimumFractionDigits: 1 });
+      if (window.WitBoutiquePayment && window.WitBoutiquePayment.refreshSnipes) window.WitBoutiquePayment.refreshSnipes();
       const matches = getMatches();
       const active = getActive();
       document.getElementById('available-count').textContent = matches.length;
@@ -339,23 +363,35 @@
           <div class="amount">Entry Fee ${parseAmount(m.amount).toLocaleString('en-US')} coin(s)</div>
           <div class="btns">
             <button class="btn-join" data-join data-idx="${i}">Join Match</button>
-            <button class="btn-view">View Opponent</button>
+            <button class="btn-view" data-view-opponent>View Opponent</button>
           </div>
         `;
+        const creatorUser = m.creator || { pseudo: 'Creator', pdp: null, id: null };
+        card.querySelector('[data-view-opponent]').addEventListener('click', () => {
+          const bp = window.WitBoutiquePayment;
+          if (bp && bp.useSnipe && bp.useSnipe()) {
+            if (window.WitHeaderInit && window.WitHeaderInit.showProfile) {
+              window.WitHeaderInit.showProfile(creatorUser, { readOnly: true });
+            }
+            if (bp.refreshSnipes) bp.refreshSnipes();
+          } else {
+            alert('Il vous faut 1 snipe pour voir l\'adversaire avant le match. Achetez-en dans la boutique !');
+            window.location.href = '/boutique#snipe';
+          }
+        });
         card.querySelector('[data-join]').addEventListener('click', () => {
-          requireLoginAndThen(function() {
           const amt = parseAmount(m.amount);
-          if (getCoins() < amt) { alert('Not enough coins.'); return; }
+          if (getCoins() < amt) { return; }
           setCoins(getCoins() - amt);
           const active = getActive();
-          active.push({ ...m, id: m.id || Date.now(), opponent: 'Player ' + (active.length + 1) });
+          const opponentUser = m.creator || { pseudo: 'Player ' + (active.length + 1), pdp: null, id: null };
+          active.push({ ...m, id: m.id || Date.now(), opponent: opponentUser.pseudo || ('Player ' + (active.length + 1)), opponentUser });
           setActive(active);
           const all = getMatches();
           all.splice(i, 1);
           setMatches(all);
           document.querySelector('.tab[data-tab="active"]').click();
           updateUI();
-          });
         });
         container.appendChild(card);
       });
@@ -406,19 +442,10 @@
       document.getElementById('active-matches').style.display = t.dataset.tab === 'active' ? 'grid' : 'none';
     }));
 
-    function requireLoginAndThen(cb) {
-      if (window.WitAuth && window.WitAuth.isLoggedIn && window.WitAuth.isLoggedIn()) {
-        if (typeof cb === 'function') cb();
-        return;
-      }
-      (window.WitAuth && window.WitAuth.login ? window.WitAuth.login() : Promise.resolve(null)).then(function(u) {
-        if (u && typeof cb === 'function') cb();
-        else if (!u) alert('Sign in or create an account to continue.');
-      });
-    }
-
     document.getElementById('btn-open-modal').addEventListener('click', () => {
-      requireLoginAndThen(() => document.getElementById('create-modal').classList.add('open'));
+      (window.WitAuth && window.WitAuth.login && window.WitAuth.login()).then(function() {
+        document.getElementById('create-modal').classList.add('open');
+      });
     });
     document.getElementById('modal-close').addEventListener('click', () => document.getElementById('create-modal').classList.remove('open'));
 
@@ -430,14 +457,12 @@
 
     document.getElementById('create-form').addEventListener('submit', (e) => {
       e.preventDefault();
-      if (!(window.WitAuth && window.WitAuth.isLoggedIn && window.WitAuth.isLoggedIn())) {
-        alert('Sign in to create a match.');
-        return;
-      }
       const form = e.target;
       const amount = parseAmount(form.querySelector('[name="amount-custom"]').value);
-      if (amount < 0.5) { alert('Minimum 0.5 coin'); return; }
-      if (getCoins() < amount) { alert('Not enough coins.'); return; }
+      if (amount < 0.5) { return; }
+      if (getCoins() < amount) { return; }
+      const user = (window.WitAuth && window.WitAuth.getUser()) || {};
+      const creator = { id: user.id, pseudo: user.pseudo || 'Creator', pdp: user.pdp || null };
       const match = {
         id: Date.now(),
         amount,
@@ -446,7 +471,8 @@
         platform: form.platform.value,
         mode: form.mode.value,
         firstTo: form.firstTo.value,
-        loot: form.loot.value
+        loot: form.loot.value,
+        creator
       };
       const matches = getMatches();
       matches.push(match);
@@ -473,7 +499,6 @@
 
     document.getElementById('btn-victory').addEventListener('click', () => {
       if (!currentPanelMatchId) return;
-      alert('Victory! Winnings have been credited.');
       const active = getActive();
       const m = active[currentPanelMatchId.idx];
       if (m) {

@@ -132,9 +132,8 @@
     <div class="main-wrap">
       <div class="top-bar">
         <div class="top-bar-left">
-          <a href="/" class="top-logo"><img src="/images/logo-noir.png" alt="WIT"></a>
           <div class="search-wrap">
-            <span class="search-icon">&#128269;</span>
+            <span class="search-icon"><img src="/images/search.svg" alt="" aria-hidden="true"></span>
             <input type="text" id="search-input" placeholder="Search username...">
           </div>
         </div>
@@ -143,6 +142,10 @@
             <img src="/images/coin.png" alt="" class="coin-icon">
             <span id="coins">0</span>
           </a>
+          <span class="snipes-display" title="Snipes pour voir un adversaire avant le match">
+            <svg class="snipe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            <span id="snipes">0</span>
+          </span>
           <div id="auth-area"></div>
         </div>
       </div>
@@ -157,6 +160,10 @@
             </div>
             <div class="profile-info">
               <div class="profile-pseudo">-</div>
+              <div class="profile-pseudo-edit">
+                <input type="text" id="profile-pseudo-input" placeholder="Changer pseudo" maxlength="20">
+                <button type="button" id="profile-pseudo-btn">Valider</button>
+              </div>
               <div class="profile-links">
                 <button type="button" class="btn-link-epic"><span class="btn-icon btn-icon-epic" aria-hidden="true"></span>Epic Games</button>
                 <button type="button" class="btn-link-discord"><span class="btn-icon btn-icon-discord" aria-hidden="true"></span>Discord</button>
@@ -190,10 +197,28 @@
           </div>
         </div>
       </div>
-      <div class="shop-content placehold" id="cat-snipe">Snipe - Coming soon</div>
+      <div class="shop-content" id="cat-snipe">
+        <p class="shop-desc" style="margin-bottom:1rem;color:#a1a1aa;">Les snipes permettent de voir le profil de l'adversaire avant de rejoindre un match.</p>
+        <div class="bundle-grid" id="snipe-grid"></div>
+      </div>
       <div class="shop-content placehold" id="cat-tag">Tag - Coming soon</div>
     </div>
   </main>
+  <footer class="footer-wrap">
+    <a href="/" class="footer-logo font-heading"><span class="logo-title">Win is Key</span><span class="logo-wit">WIT</span></a>
+    <div class="footer-social">
+      <a href="https://discord.gg/nPvsqw7JSc" target="_blank" rel="noopener" title="Rejoindre notre Discord">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.8 19.8 0 0 0-4.885-1.5.07.07 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.3 18.3 0 0 0-5.487 0 12.6 12.6 0 0 0-.617-1.25.08.08 0 0 0-.079-.037A19.7 19.7 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.08.08 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.08.08 0 0 0 .084-.028 14.1 14.1 0 0 0 1.226-1.994.08.08 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.08.08 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.07.07 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.07.07 0 0 1 .078.01c.12.098.246.198.373.292a.08.08 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.08.08 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.08.08 0 0 0 .084.028 19.8 19.8 0 0 0 6.002-3.03.08.08 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.06.06 0 0 0-.031-.03z"/></svg>
+      </a>
+    </div>
+    <nav class="footer-nav">
+      <a href="/">Home</a>
+      <a href="/matches">Matches</a>
+      <a href="/tournois">Tournaments</a>
+      <a href="/boutique">Shop</a>
+    </nav>
+    <p class="footer-copy">© 2025 Win is Key</p>
+  </footer>
     </div>
   </div>
   <script src="/config-discord.js"></script>
@@ -217,6 +242,7 @@
     if (window.WitBoutiquePayment) {
       window.WitBoutiquePayment.handlePaymentSuccess();
       window.WitBoutiquePayment.initCoins();
+      window.WitBoutiquePayment.initSnipes();
     } else {
       document.getElementById('coins').textContent = parseFloat(localStorage.getItem('wit-coins') || '1000').toLocaleString('en-US', {minimumFractionDigits:1});
     }
@@ -237,26 +263,69 @@
         <button class="btn-buy" data-amount="${b.amount}">${price}$ PURCHASE</button>
       `;
       card.querySelector('.btn-buy').addEventListener('click', function(ev) {
-        if (!(window.WitBoutiquePayment && window.WitBoutiquePayment.isLoggedIn && window.WitBoutiquePayment.isLoggedIn())) {
-          (window.WitAuth && window.WitAuth.login ? window.WitAuth.login() : Promise.resolve(null)).then(function(u) {
-            if (u) { card.querySelector('.btn-buy').click(); }
-            else alert('Sign in or create an account to buy coins.');
-          });
-          return;
-        }
         var amt = parseInt(this.getAttribute('data-amount'), 10);
-        if (window.WitBoutiquePayment && window.WitBoutiquePayment.payWithCard) {
-          window.WitBoutiquePayment.payWithCard(amt, ev);
-        }
+        (window.WitAuth && window.WitAuth.login ? window.WitAuth.login() : Promise.resolve(null)).then(function() {
+          if (window.WitBoutiquePayment && window.WitBoutiquePayment.payWithCard) {
+            window.WitBoutiquePayment.payWithCard(amt, ev);
+          }
+        });
       });
       grid.appendChild(card);
     });
 
+    const snipeBundles = [
+      { amount: 5, cost: 5, color: 'blue' },
+      { amount: 20, cost: 15, color: 'red' },
+      { amount: 50, cost: 30, color: 'gold' }
+    ];
+    const snipeGrid = document.getElementById('snipe-grid');
+    snipeBundles.forEach(b => {
+      const card = document.createElement('div');
+      card.className = 'bundle-card ' + b.color;
+      card.innerHTML = `
+        <div class="bundle-label snipe-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:24px;height:24px;color:#ef4444"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          <span>${b.amount} snipes</span>
+        </div>
+        <div class="chest-img-wrap">
+          <img src="/images/chest.png" alt="" class="chest-img">
+        </div>
+        <div class="bundle-price">
+          <img src="/images/coin.png" alt="" style="width:18px;height:18px;vertical-align:middle"> ${b.cost} coins
+        </div>
+        <button class="btn-buy btn-buy-snipe" data-amount="${b.amount}" data-cost="${b.cost}">ACHETER</button>
+      `;
+      card.querySelector('.btn-buy-snipe').addEventListener('click', function() {
+        (window.WitAuth && window.WitAuth.login ? window.WitAuth.login() : Promise.resolve()).then(function() {
+          var amt = parseInt(this.getAttribute('data-amount'), 10);
+          var cost = parseInt(this.getAttribute('data-cost'), 10);
+          if (window.WitBoutiquePayment && window.WitBoutiquePayment.buySnipesWithCoins) {
+            if (window.WitBoutiquePayment.buySnipesWithCoins(amt, cost)) {
+              if (window.WitBoutiquePayment.refreshCoins) window.WitBoutiquePayment.refreshCoins();
+              if (window.WitBoutiquePayment.refreshSnipes) window.WitBoutiquePayment.refreshSnipes();
+            } else {
+              alert('Pas assez de coins. Achetez des coins d\'abord.');
+            }
+          }
+        }.bind(this));
+      });
+      snipeGrid.appendChild(card);
+    });
+
+    function switchToCat(cat) {
+      var tab = document.querySelector('.shop-tab[data-cat="' + cat + '"]');
+      if (tab) {
+        document.querySelectorAll('.shop-tab').forEach(function(x) { x.classList.remove('active'); });
+        document.querySelectorAll('.shop-content').forEach(function(x) { x.classList.remove('active'); });
+        tab.classList.add('active');
+        var catEl = document.getElementById('cat-' + cat);
+        if (catEl) catEl.classList.add('active');
+      }
+    }
+    if (window.location.hash === '#snipe') switchToCat('snipe');
+
     document.querySelectorAll('.shop-tab').forEach(t => t.addEventListener('click', () => {
-      document.querySelectorAll('.shop-tab').forEach(x => x.classList.remove('active'));
-      document.querySelectorAll('.shop-content').forEach(x => x.classList.remove('active'));
-      t.classList.add('active');
-      document.getElementById('cat-' + t.dataset.cat).classList.add('active');
+      switchToCat(t.dataset.cat);
     }));
 
     (function giftCode() {
@@ -264,29 +333,24 @@
       var btn = document.querySelector('.btn-gift');
       var input = document.getElementById('gift-input');
       btn.addEventListener('click', function() {
-        if (!(window.WitBoutiquePayment && window.WitBoutiquePayment.isLoggedIn && window.WitBoutiquePayment.isLoggedIn())) {
-          (window.WitAuth && window.WitAuth.login ? window.WitAuth.login() : Promise.resolve(null)).then(function(u) {
-            if (u) { btn.click(); }
-            else alert('Sign in or create an account to use a gift code.');
-          });
-          return;
-        }
-        var raw = (input.value || '').trim().toUpperCase();
-        if (!raw) { return; }
-        if (used.indexOf(raw) >= 0) { return; }
-        var list = typeof GIFT_CODES !== 'undefined' ? GIFT_CODES : [];
-        var found = null;
-        for (var i = 0; i < list.length; i++) {
-          if (list[i].code.toUpperCase() === raw) { found = list[i]; break; }
-        }
-        if (!found) { return; }
-        used.push(raw);
-        localStorage.setItem('wit-used-codes', JSON.stringify(used));
-        var c = (window.WitBoutiquePayment && window.WitBoutiquePayment.loadCoinsFromStorage) ? window.WitBoutiquePayment.loadCoinsFromStorage() : 0;
-        var newVal = c + found.amount;
-        if (window.WitBoutiquePayment && window.WitBoutiquePayment.saveCoinsToStorage) window.WitBoutiquePayment.saveCoinsToStorage(newVal);
-        else document.getElementById('coins').textContent = newVal.toLocaleString('en-US', { minimumFractionDigits: 1 });
-        input.value = '';
+        (window.WitAuth && window.WitAuth.login ? window.WitAuth.login() : Promise.resolve(null)).then(function() {
+          var raw = (input.value || '').trim().toUpperCase();
+          if (!raw) { return; }
+          if (used.indexOf(raw) >= 0) { return; }
+          var list = typeof GIFT_CODES !== 'undefined' ? GIFT_CODES : [];
+          var found = null;
+          for (var i = 0; i < list.length; i++) {
+            if (list[i].code.toUpperCase() === raw) { found = list[i]; break; }
+          }
+          if (!found) { return; }
+          used.push(raw);
+          localStorage.setItem('wit-used-codes', JSON.stringify(used));
+          var c = (window.WitBoutiquePayment && window.WitBoutiquePayment.loadCoinsFromStorage) ? window.WitBoutiquePayment.loadCoinsFromStorage() : 0;
+          var newVal = c + found.amount;
+          if (window.WitBoutiquePayment && window.WitBoutiquePayment.saveCoinsToStorage) window.WitBoutiquePayment.saveCoinsToStorage(newVal);
+          else document.getElementById('coins').textContent = newVal.toLocaleString('en-US', { minimumFractionDigits: 1 });
+          input.value = '';
+        });
       });
     })();
   </script>
