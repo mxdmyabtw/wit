@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    { "source": "/matches", "destination": "/matches.html" },
+    { "source": "/boutique", "destination": "/boutique.html" },
+    { "source": "/tournois", "destination": "/tournois.html" }
+  ]
+}

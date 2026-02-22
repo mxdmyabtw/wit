@@ -1,0 +1,5 @@
+# Netlify - redirections pour URLs propres
+# https://winiskey.com
+/matches    /matches.html    200
+/boutique   /boutique.html   200
+/tournois   /tournois.html   200

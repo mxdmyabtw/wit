@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Win is Key - Matchs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/header-shared.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { overflow-x: hidden; max-width: 100vw; }
+    body { font-family: 'Space Grotesk', sans-serif; background: #0d0f14; color: #f4f4f5; min-height: 100vh; }
+    .font-heading { font-family: 'Orbitron', sans-serif; }
+
+    .app { display: flex; min-height: 100vh; }
+    .sidebar {
+      position: fixed; left: 0; top: 0; bottom: 0; width: 64px;
+      background: rgba(24, 24, 27, 0.98); border-right: 1px solid #27272a;
+      display: flex; flex-direction: column; align-items: center; padding-top: 1rem; gap: 0.5rem; z-index: 100;
+    }
+    .sidebar .logo-mini { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none; margin-bottom: 1rem; overflow: hidden; }
+    .sidebar .logo-mini img { width: 100%; height: 100%; object-fit: contain; }
+    .sidebar a { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 8px; color: #71717a; text-decoration: none; font-size: 1.25rem; transition: all 0.2s; }
+    .sidebar .nav-icon { font-size: 1.35rem; }
+    .sidebar a:hover { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+    .sidebar a.active { color: #2563eb; background: rgba(37, 99, 235, 0.2); }
+    .main-wrap { flex: 1; margin-left: 64px; min-width: 0; display: flex; flex-direction: column; min-height: 100vh; max-width: calc(100vw - 64px); }
+    main { flex: 1; padding-top: 72px; max-width: min(1280px, calc(100vw - 64px - 2rem)); margin: 0 auto; padding-left: 1rem; padding-right: 1rem; padding-bottom: 2rem; width: 100%; min-width: 0; }
+
+    .page-header { margin-bottom: 1.5rem; }
+    .page-header h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .page-header p { color: #71717a; font-size: 0.875rem; }
+
+    .btn-create-match {
+      padding: 0.75rem 1.5rem;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+    .btn-create-match:hover { background: #3b82f6; }
+
+    .tabs { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+    .tab { padding: 0.5rem 1rem; background: transparent; border: 1px solid #27272a; color: #a1a1aa; border-radius: 8px; cursor: pointer; }
+    .tab:hover { border-color: #52525b; color: #f4f4f5; }
+    .tab.active { background: rgba(37, 99, 235, 0.2); border-color: #2563eb; color: #60a5fa; }
+
+    .matches-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+    .match-card {
+      background: rgba(39, 39, 42, 0.8); border: 1px solid #27272a; border-radius: 12px; padding: 1rem;
+    }
+    .match-card .badge { font-size: 0.7rem; color: #60a5fa; margin-bottom: 0.5rem; }
+    .match-card .mode { font-size: 0.9rem; font-weight: 600; color: #f59e0b; margin-bottom: 0.5rem; }
+    .match-card .info { font-size: 0.75rem; color: #71717a; margin-bottom: 0.75rem; }
+    .match-card .info span { margin-right: 1rem; }
+    .match-card .amount { font-size: 1rem; font-weight: 700; color: #f59e0b; margin-bottom: 1rem; }
+    .match-card .btns { display: flex; gap: 0.5rem; }
+    .match-card .btn-join { flex: 1; padding: 0.5rem; background: #2563eb; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+    .match-card .btn-join:hover { background: #3b82f6; }
+    .match-card .btn-view { padding: 0.5rem 1rem; background: transparent; border: 1px solid #3f3f46; color: #a1a1aa; border-radius: 8px; cursor: pointer; }
+    .match-card .btn-view:hover { border-color: #52525b; color: #f4f4f5; }
+
+    /* Modal Create Match */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200;
+      align-items: center; justify-content: center; padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #18181b; border: 1px solid #27272a; border-radius: 16px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto;
+    }
+    .modal-header { padding: 1rem 1.5rem; border-bottom: 1px solid #27272a; display: flex; justify-content: space-between; align-items: center; }
+    .modal-header h2 { font-size: 1.25rem; }
+    .modal-close { background: none; border: none; color: #a1a1aa; font-size: 1.5rem; cursor: pointer; }
+    .modal-body { padding: 1.5rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.75rem; color: #71717a; margin-bottom: 0.5rem; text-transform: uppercase; }
+    .form-group input, .form-group select {
+      width: 100%; padding: 0.6rem 0.75rem; background: #27272a; border: 1px solid #3f3f46; border-radius: 8px; color: #f4f4f5;
+    }
+    .presets-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
+    .presets-row button {
+      padding: 0.5rem 1rem; background: #27272a; border: 1px solid #3f3f46; border-radius: 8px; color: #a1a1aa; cursor: pointer;
+    }
+    .presets-row button:hover, .presets-row button.selected { background: rgba(37, 99, 235, 0.2); border-color: #2563eb; color: #60a5fa; }
+    .btn-create-modal { width: 100%; padding: 0.75rem; background: #2563eb; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 1rem; }
+    .btn-create-modal:hover { background: #3b82f6; }
+
+    /* Match detail panel (active match) */
+    .match-panel {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 300; align-items: center; justify-content: center; padding: 1rem;
+    }
+    .match-panel.open { display: flex; }
+    .match-panel-inner {
+      background: #18181b; border: 1px solid #27272a; border-radius: 16px; width: 100%; max-width: 900px; max-height: 90vh;
+      display: grid; grid-template-columns: 1fr 280px;
+      overflow: hidden;
+    }
+    .match-panel-main { padding: 1.5rem; }
+    .match-panel-main .mode { font-size: 1.25rem; font-weight: 600; color: #f59e0b; margin-bottom: 1rem; }
+    .match-panel-main .info { font-size: 0.875rem; color: #71717a; margin-bottom: 2rem; }
+    .match-buttons { display: flex; gap: 1rem; justify-content: center; margin-bottom: 1rem; }
+    .btn-victory { padding: 1rem 2rem; background: #22c55e; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+    .btn-victory:hover { background: #16a34a; }
+    .btn-defeat { padding: 1rem 2rem; background: #ef4444; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+    .btn-defeat:hover { background: #dc2626; }
+    .btn-cancel { display: block; margin: 0 auto; padding: 0.5rem 1.5rem; background: transparent; border: 1px solid #52525b; color: #a1a1aa; border-radius: 8px; cursor: pointer; }
+    .btn-cancel:hover { border-color: #71717a; color: #f4f4f5; }
+    .match-panel-chat {
+      background: #0d0f14; border-left: 1px solid #27272a; padding: 1rem; display: flex; flex-direction: column;
+    }
+    .match-panel-chat h3 { font-size: 0.875rem; margin-bottom: 1rem; color: #71717a; }
+    .chat-messages { flex: 1; overflow-y: auto; margin-bottom: 1rem; font-size: 0.875rem; }
+    .chat-messages .msg { margin-bottom: 0.5rem; }
+    .chat-messages .msg .from { color: #f59e0b; font-weight: 600; }
+    .chat-input { display: flex; gap: 0.5rem; }
+    .chat-input input { flex: 1; padding: 0.5rem; background: #27272a; border: 1px solid #3f3f46; border-radius: 8px; color: #f4f4f5; }
+    .chat-input button { padding: 0.5rem 1rem; background: #2563eb; color: #fff; border: none; border-radius: 8px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a href="/" class="logo-mini"><img src="/images/logo-noir.png" alt="WIT"></a>
+      <a href="/" title="Accueil"><span class="nav-icon">&#127968;</span></a>
+      <a href="/matches" class="active" title="Matchs"><span class="nav-icon">&#128481;</span></a>
+      <a href="/tournois" title="Tournois"><span class="nav-icon">&#127942;</span></a>
+      <a href="/boutique" title="Boutique"><span class="nav-icon">&#128230;</span></a>
+    </aside>
+    <div class="main-wrap">
+      <div class="top-bar">
+        <div class="top-bar-left">
+          <a href="/" class="top-logo"><img src="/images/logo-noir.png" alt="WIT"></a>
+          <div class="search-wrap">
+            <span class="search-icon">&#128269;</span>
+            <input type="text" id="search-input" placeholder="Rechercher un pseudo...">
+          </div>
+        </div>
+        <div class="top-bar-right">
+          <a href="/boutique" class="coins-display">
+            <img src="/images/coin.png" alt="" class="coin-icon">
+            <span id="coins">1000</span>
+          </a>
+          <div id="auth-area"></div>
+        </div>
+      </div>
+      <div id="modal-auth" class="modal-auth">
+        <div class="modal-auth-inner">
+          <button class="modal-close" type="button">&times;</button>
+          <h2>Connexion</h2>
+          <p>Connecte-toi avec ton compte Google pour jouer.</p>
+          <button id="btn-google" class="btn-google">
+            <svg viewBox="0 0 24 24" style="width:20px;height:20px"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            Se connecter avec Google
+          </button>
+        </div>
+      </div>
+      <div id="modal-profile" class="modal-profile">
+        <div class="modal-profile-inner">
+          <button class="modal-close" type="button">&times;</button>
+          <h2>Profil</h2>
+          <div class="profile-header">
+            <img class="profile-pdp" alt="avatar">
+            <div class="profile-info">
+              <div class="profile-pseudo">-</div>
+              <div class="profile-links">
+                <button type="button" class="btn-link-epic">Epic Games</button>
+                <button type="button" class="btn-link-discord">Discord</button>
+              </div>
+            </div>
+          </div>
+          <div class="profile-stats">
+            <div class="profile-stat"><div class="label">Total pieces gagnees</div><div class="value stat-total">0</div></div>
+            <div class="profile-stat"><div class="label">Victoires</div><div class="value stat-wins">0</div></div>
+            <div class="profile-stat"><div class="label">Defaites</div><div class="value stat-losses">0</div></div>
+            <div class="profile-stat"><div class="label">Matchs joues</div><div class="value stat-matches">0</div></div>
+          </div>
+        </div>
+      </div>
+  <main>
+    <div class="page-header">
+      <h1 class="font-heading">LIVE MATCHES</h1>
+      <p>Entre sur l'arene : cree et rejoins des matchs.</p>
+    </div>
+
+    <button class="btn-create-match" id="btn-open-modal">Create match</button>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="available">Available matches <span id="available-count">0</span></button>
+      <button class="tab" data-tab="active">My active matches <span id="active-count">0</span></button>
+    </div>
+
+    <div id="available-matches" class="matches-grid"></div>
+    <div id="active-matches" class="matches-grid" style="display:none"></div>
+  </main>
+    </div>
+  </div>
+
+  <!-- Modal Create Match -->
+  <div class="modal-overlay" id="create-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="font-heading">Create Match</h2>
+        <button class="modal-close" id="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="create-form">
+          <div class="form-group">
+            <label>Entry Coins *</label>
+            <div class="presets-row">
+              <button type="button" class="preset selected" data-amt="0.5">0.5</button>
+              <button type="button" class="preset" data-amt="1">1</button>
+              <button type="button" class="preset" data-amt="5">5</button>
+              <button type="button" class="preset" data-amt="10">10</button>
+            </div>
+            <input type="text" name="amount-custom" placeholder="Mise personnalisee (ex: 2,5)" value="0.5">
+          </div>
+          <div class="form-group">
+            <label>Game *</label>
+            <select name="game"><option value="FN">FN</option></select>
+          </div>
+          <div class="form-group">
+            <label>Region *</label>
+            <select name="region">
+              <option value="EU">EU</option>
+              <option value="NE EAST">NE EAST</option>
+              <option value="NA WEST">NA WEST</option>
+              <option value="OCE">OCE</option>
+              <option value="ME">ME</option>
+              <option value="NA CENTRAL">NA CENTRAL</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Platform *</label>
+            <select name="platform">
+              <option value="PC">PC</option>
+              <option value="Console">Console</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Game Mode *</label>
+            <select name="mode">
+              <option value="Boxfight">Boxfight</option>
+              <option value="Build Fight">Build Fight</option>
+              <option value="Realistic">Realistic</option>
+              <option value="Zone Wars">Zone Wars</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>First To *</label>
+            <select name="firstTo">
+              <option value="1">1</option>
+              <option value="3">3</option>
+              <option value="5">5</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Loot Type *</label>
+            <select name="loot">
+              <option value="Havoc Shotgun">Havoc Shotgun</option>
+              <option value="Sentinel Shotgun">Sentinel Shotgun</option>
+              <option value="Boxfight Loot">Boxfight Loot</option>
+              <option value="Iron Pump Shotgun">Iron Pump Shotgun</option>
+            </select>
+          </div>
+          <button type="submit" class="btn-create-modal">CREATE A MATCH</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active match panel (chat + victory/defeat/cancel) -->
+  <div class="match-panel" id="match-panel">
+    <div class="match-panel-inner">
+      <div class="match-panel-main">
+        <div class="mode" id="panel-mode"></div>
+        <div class="info" id="panel-info"></div>
+        <div class="match-buttons">
+          <button class="btn-victory" id="btn-victory">Victoire</button>
+          <button class="btn-defeat" id="btn-defeat">Defaite</button>
+        </div>
+        <button class="btn-cancel" id="btn-panel-cancel">Cancel</button>
+      </div>
+      <div class="match-panel-chat">
+        <h3>Chat</h3>
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input">
+          <input type="text" id="chat-input" placeholder="Ecrire un message...">
+          <button id="chat-send">Envoyer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'wit-coins';
+    const MATCHES_KEY = 'wit-matches';
+    const ACTIVE_KEY = 'wit-active-matches';
+    const CHAT_KEY = 'wit-chat-';
+
+    const getCoins = () => parseFloat(localStorage.getItem(STORAGE_KEY) || '1000');
+    const setCoins = (n) => {
+      localStorage.setItem(STORAGE_KEY, String(n));
+      document.getElementById('coins').textContent = n.toLocaleString('fr-FR', { minimumFractionDigits: 1 });
+    };
+    const getMatches = () => JSON.parse(localStorage.getItem(MATCHES_KEY) || '[]');
+    const setMatches = (m) => localStorage.setItem(MATCHES_KEY, JSON.stringify(m));
+    const getActive = () => JSON.parse(localStorage.getItem(ACTIVE_KEY) || '[]');
+    const setActive = (a) => localStorage.setItem(ACTIVE_KEY, JSON.stringify(a));
+
+    const parseAmount = (v) => {
+      const n = parseFloat(String(v).replace(',', '.'));
+      return isNaN(n) ? 0.5 : n;
+    };
+
+    let currentPanelMatchId = null;
+
+    function updateUI() {
+      document.getElementById('coins').textContent = getCoins().toLocaleString('fr-FR', { minimumFractionDigits: 1 });
+      const matches = getMatches();
+      const active = getActive();
+      document.getElementById('available-count').textContent = matches.length;
+      document.getElementById('active-count').textContent = active.length;
+      renderAvailable();
+      renderActive();
+    }
+
+    function renderAvailable() {
+      const matches = getMatches();
+      const container = document.getElementById('available-matches');
+      container.innerHTML = '';
+      matches.forEach((m, i) => {
+        const card = document.createElement('div');
+        card.className = 'match-card';
+        card.innerHTML = `
+          <div class="badge">FN | ${m.region} | ${m.platform}</div>
+          <div class="mode">1V1 ${m.mode} (${m.loot})</div>
+          <div class="info"><span>First To ${m.firstTo}</span></div>
+          <div class="amount">Entry Fee ${parseAmount(m.amount).toLocaleString('fr-FR')} piece(s)</div>
+          <div class="btns">
+            <button class="btn-join" data-join data-idx="${i}">Join Match</button>
+            <button class="btn-view">View Opponent</button>
+          </div>
+        `;
+        card.querySelector('[data-join]').addEventListener('click', () => {
+          const amt = parseAmount(m.amount);
+          if (getCoins() < amt) { alert('Pas assez de pieces.'); return; }
+          setCoins(getCoins() - amt);
+          const active = getActive();
+          active.push({ ...m, id: m.id || Date.now(), opponent: 'Joueur ' + (active.length + 1) });
+          setActive(active);
+          const all = getMatches();
+          all.splice(i, 1);
+          setMatches(all);
+          document.querySelector('.tab[data-tab="active"]').click();
+          updateUI();
+        });
+        container.appendChild(card);
+      });
+      if (matches.length === 0) container.innerHTML = '<p style="color:#71717a;grid-column:1/-1;">Aucun match disponible.</p>';
+    }
+
+    function renderActive() {
+      const active = getActive();
+      const container = document.getElementById('active-matches');
+      container.innerHTML = '';
+      active.forEach((m, i) => {
+        const card = document.createElement('div');
+        card.className = 'match-card';
+        card.innerHTML = `
+          <div class="badge">FN | ${m.region}</div>
+          <div class="mode">1V1 ${m.mode}</div>
+          <div class="info"><span>First To ${m.firstTo}</span><span>vs ${m.opponent || 'En attente'}</span></div>
+          <div class="amount">${parseAmount(m.amount).toLocaleString('fr-FR')} piece(s)</div>
+          <button class="btn-join" data-open-panel data-idx="${i}">Voir le match</button>
+        `;
+        card.querySelector('[data-open-panel]').addEventListener('click', () => openMatchPanel(m.id, i));
+        container.appendChild(card);
+      });
+      if (active.length === 0) container.innerHTML = '<p style="color:#71717a;grid-column:1/-1;">Aucun match en cours.</p>';
+    }
+
+    function openMatchPanel(matchId, idx) {
+      const active = getActive()[idx];
+      if (!active) return;
+      currentPanelMatchId = { id: active.id, idx };
+      document.getElementById('panel-mode').textContent = `1V1 ${active.mode} (${active.loot})`;
+      document.getElementById('panel-info').textContent = `Region ${active.region} | First To ${active.firstTo} | vs ${active.opponent}`;
+      const chat = JSON.parse(localStorage.getItem(CHAT_KEY + active.id) || '[]');
+      const chatEl = document.getElementById('chat-messages');
+      chatEl.innerHTML = chat.map(x => `<div class="msg"><span class="from">${x.from}:</span> ${x.msg}</div>`).join('');
+      document.getElementById('match-panel').classList.add('open');
+    }
+
+    function closeMatchPanel() {
+      document.getElementById('match-panel').classList.remove('open');
+      currentPanelMatchId = null;
+    }
+
+    document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      document.getElementById('available-matches').style.display = t.dataset.tab === 'available' ? 'grid' : 'none';
+      document.getElementById('active-matches').style.display = t.dataset.tab === 'active' ? 'grid' : 'none';
+    }));
+
+    document.getElementById('btn-open-modal').addEventListener('click', () => document.getElementById('create-modal').classList.add('open'));
+    document.getElementById('modal-close').addEventListener('click', () => document.getElementById('create-modal').classList.remove('open'));
+
+    document.querySelectorAll('.preset').forEach(b => b.addEventListener('click', () => {
+      document.querySelectorAll('.preset').forEach(x => x.classList.remove('selected'));
+      b.classList.add('selected');
+      document.querySelector('[name="amount-custom"]').value = b.dataset.amt;
+    }));
+
+    document.getElementById('create-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const amount = parseAmount(form.querySelector('[name="amount-custom"]').value);
+      if (amount < 0.5) { alert('Minimum 0.5 piece'); return; }
+      if (getCoins() < amount) { alert('Pas assez de pieces.'); return; }
+      const match = {
+        id: Date.now(),
+        amount,
+        game: form.game.value,
+        region: form.region.value,
+        platform: form.platform.value,
+        mode: form.mode.value,
+        firstTo: form.firstTo.value,
+        loot: form.loot.value
+      };
+      const matches = getMatches();
+      matches.push(match);
+      setMatches(matches);
+      setCoins(getCoins() - amount);
+      document.getElementById('create-modal').classList.remove('open');
+      form.querySelector('[name="amount-custom"]').value = '0.5';
+      document.querySelectorAll('.preset').forEach(x => x.classList.remove('selected'));
+      updateUI();
+    });
+
+    document.getElementById('btn-panel-cancel').addEventListener('click', () => {
+      if (!currentPanelMatchId) return;
+      const active = getActive();
+      const m = active[currentPanelMatchId.idx];
+      if (m) {
+        setCoins(getCoins() + parseAmount(m.amount));
+        active.splice(currentPanelMatchId.idx, 1);
+        setActive(active);
+      }
+      closeMatchPanel();
+      updateUI();
+    });
+
+    document.getElementById('btn-victory').addEventListener('click', () => {
+      if (!currentPanelMatchId) return;
+      alert('Victoire ! Les gains ont ete credites.');
+      const active = getActive();
+      const m = active[currentPanelMatchId.idx];
+      if (m) {
+        var amt = parseAmount(m.amount) * 2;
+        setCoins(getCoins() + amt);
+        if (window.WitAuth) window.WitAuth.addMatchResult(true, parseAmount(m.amount));
+        active.splice(currentPanelMatchId.idx, 1);
+        setActive(active);
+      }
+      closeMatchPanel();
+      updateUI();
+    });
+
+    document.getElementById('btn-defeat').addEventListener('click', () => {
+      if (!currentPanelMatchId) return;
+      const active = getActive();
+      const m = active[currentPanelMatchId.idx];
+      if (m && window.WitAuth) window.WitAuth.addMatchResult(false, 0);
+      if (active.length) active.splice(currentPanelMatchId.idx, 1);
+      setActive(active);
+      closeMatchPanel();
+      updateUI();
+    });
+
+    document.getElementById('chat-send').addEventListener('click', () => {
+      const input = document.getElementById('chat-input');
+      const msg = input.value.trim();
+      if (!msg || !currentPanelMatchId) return;
+      const active = getActive()[currentPanelMatchId.idx];
+      if (!active) return;
+      const key = CHAT_KEY + active.id;
+      const chat = JSON.parse(localStorage.getItem(key) || '[]');
+      chat.push({ from: 'Moi', msg });
+      localStorage.setItem(key, JSON.stringify(chat));
+      document.getElementById('chat-messages').innerHTML += `<div class="msg"><span class="from">Moi:</span> ${msg}</div>`;
+      input.value = '';
+    });
+
+    updateUI();
+  </script>
+  <script src="/config-discord.js"></script>
+  <script src="/auth.js"></script>
+  <script src="/header-init.js"></script>
+</body>
+</html>

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Win is Key - Boutique</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/header-shared.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { overflow-x: hidden; max-width: 100vw; }
+    body { font-family: 'Space Grotesk', sans-serif; background: #0d0f14; color: #f4f4f5; min-height: 100vh; }
+    .font-heading { font-family: 'Orbitron', sans-serif; }
+    .app { display: flex; min-height: 100vh; }
+    .sidebar {
+      position: fixed; left: 0; top: 0; bottom: 0; width: 64px;
+      background: rgba(24, 24, 27, 0.98); border-right: 1px solid #27272a;
+      display: flex; flex-direction: column; align-items: center; padding-top: 1rem; gap: 0.5rem; z-index: 100;
+    }
+    .sidebar .logo-mini { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none; margin-bottom: 1rem; overflow: hidden; }
+    .sidebar .logo-mini img { width: 100%; height: 100%; object-fit: contain; }
+    .sidebar a { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 8px; color: #71717a; text-decoration: none; font-size: 1.25rem; transition: all 0.2s; }
+    .sidebar .nav-icon { font-size: 1.35rem; }
+    .sidebar a:hover { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+    .sidebar a.active { color: #2563eb; background: rgba(37, 99, 235, 0.2); }
+    .main-wrap { flex: 1; margin-left: 64px; min-width: 0; display: flex; flex-direction: column; min-height: 100vh; max-width: calc(100vw - 64px); }
+    main { flex: 1; padding-top: 72px; display: flex; min-height: 100vh; min-width: 0; overflow: hidden; }
+
+    .shop-cats {
+      width: 180px; padding: 1rem; border-right: 1px solid #27272a;
+      display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .shop-cats button {
+      display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem;
+      background: transparent; border: 1px solid transparent; border-radius: 8px;
+      color: #a1a1aa; cursor: pointer; font-size: 0.9rem; text-align: left;
+    }
+    .shop-cats button:hover { background: rgba(39, 39, 42, 0.8); color: #f4f4f5; }
+    .shop-cats button.active { background: rgba(37, 99, 235, 0.2); border-color: #2563eb; color: #60a5fa; }
+    .shop-cats button .ico { font-size: 1.25rem; filter: grayscale(100%); opacity: 0.9; }
+    .shop-cats button.active .ico { filter: grayscale(0); opacity: 1; }
+
+    .shop-body { flex: 1; padding: 1.5rem 2rem; min-width: 0; overflow-x: hidden; }
+    .shop-body h1 { font-size: 1.5rem; margin-bottom: 1.5rem; }
+    .shop-content { display: none; }
+    .shop-content.active { display: block; }
+    .shop-content.placehold { color: #71717a; padding: 2rem; }
+
+    .bundle-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 1.5rem; }
+    .bundle-card {
+      position: relative;
+      background: linear-gradient(145deg, rgba(39, 39, 42, 0.9), rgba(24, 24, 27, 0.9));
+      border: 2px solid #3f3f46; border-radius: 14px;
+      padding: 1.25rem; display: flex; flex-direction: column; align-items: center;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+      overflow: hidden;
+    }
+    .bundle-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .bundle-card.blue { border-color: #3b82f6; }
+    .bundle-card.blue::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+    .bundle-card.red { border-color: #ef4444; }
+    .bundle-card.red::before { background: linear-gradient(90deg, #ef4444, #f87171); }
+    .bundle-card.green { border-color: #22c55e; }
+    .bundle-card.green::before { background: linear-gradient(90deg, #22c55e, #4ade80); }
+    .bundle-card.gold { border-color: #eab308; }
+    .bundle-card.gold::before { background: linear-gradient(90deg, #eab308, #fde047); }
+    .bundle-card:hover { transform: translateY(-6px); box-shadow: 0 16px 32px rgba(0,0,0,0.5); }
+    .bundle-card.blue:hover { border-color: #60a5fa; box-shadow: 0 16px 32px rgba(59,130,246,0.3); }
+    .bundle-card.red:hover { border-color: #f87171; box-shadow: 0 16px 32px rgba(239,68,68,0.3); }
+    .bundle-card.green:hover { border-color: #4ade80; box-shadow: 0 16px 32px rgba(34,197,94,0.3); }
+    .bundle-card.gold:hover { border-color: #fde047; box-shadow: 0 16px 32px rgba(234,179,8,0.3); }
+
+    .bundle-label {
+      display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+      margin-bottom: 0.75rem; padding: 0.35rem 0.75rem; border-radius: 8px;
+    }
+    .bundle-card.blue .bundle-label { background: rgba(59,130,246,0.15); }
+    .bundle-card.red .bundle-label { background: rgba(239,68,68,0.15); }
+    .bundle-card.green .bundle-label { background: rgba(34,197,94,0.15); }
+    .bundle-card.gold .bundle-label { background: rgba(234,179,8,0.15); }
+    .bundle-label .coin-mini { width: 24px; height: 24px; object-fit: contain; }
+    .bundle-label span { font-size: 1rem; font-weight: 700; color: #f59e0b; }
+    .chest-img-wrap {
+      width: 100%; height: 120px; margin-bottom: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0.3) 0%, transparent 70%);
+      border-radius: 10px;
+    }
+    .chest-img { max-width: 95px; max-height: 95px; object-fit: contain; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4)); }
+    .bundle-card.blue .chest-img { filter: hue-rotate(165deg) saturate(1.25) drop-shadow(0 4px 12px rgba(59,130,246,0.2)); }
+    .bundle-card.red .chest-img { filter: hue-rotate(-35deg) saturate(1.2) drop-shadow(0 4px 12px rgba(239,68,68,0.2)); }
+    .bundle-card.green .chest-img { filter: hue-rotate(85deg) saturate(1.25) drop-shadow(0 4px 12px rgba(34,197,94,0.2)); }
+    .bundle-card.gold .chest-img { filter: hue-rotate(20deg) saturate(1.4) brightness(1.08) drop-shadow(0 4px 12px rgba(234,179,8,0.25)); }
+    .bundle-card .btn-buy { width: 100%; padding: 0.6rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.8rem; }
+    .bundle-card.blue .btn-buy { background: #3b82f6; color: #fff; }
+    .bundle-card.red .btn-buy { background: #ef4444; color: #fff; }
+    .bundle-card.green .btn-buy { background: #22c55e; color: #fff; }
+    .bundle-card.gold .btn-buy { background: #eab308; color: #0d0f14; }
+    .bundle-card .btn-buy:hover { opacity: 0.9; }
+
+    .gift-section { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid #3f3f46; max-width: 400px; }
+    .gift-section h3 { font-size: 1rem; margin-bottom: 1rem; color: #a1a1aa; display: flex; align-items: center; gap: 0.5rem; }
+    .gift-section .gift-icon { font-size: 1.25rem; }
+    .gift-code-row { display: flex; gap: 0.5rem; align-items: center; }
+    .gift-code-row input {
+      flex: 1; padding: 0.65rem 1rem; border-radius: 8px; border: 1px solid #3f3f46;
+      background: rgba(39, 39, 42, 0.8); color: #f4f4f5; font-size: 0.95rem;
+    }
+    .gift-code-row input::placeholder { color: #71717a; }
+    .gift-code-row input:focus { outline: none; border-color: #f59e0b; }
+    .btn-gift {
+      display: flex; align-items: center; gap: 0.5rem; padding: 0.65rem 1.25rem;
+      background: linear-gradient(135deg, #f59e0b, #d97706); border: none; border-radius: 8px;
+      color: #0d0f14; font-weight: 700; cursor: pointer; font-size: 0.9rem; transition: opacity 0.2s;
+    }
+    .btn-gift:hover { opacity: 0.9; }
+    .btn-gift .gift-icon { font-size: 1.1rem; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a href="/" class="logo-mini"><img src="/images/logo-noir.png" alt="WIT"></a>
+      <a href="/" title="Accueil"><span class="nav-icon">&#127968;</span></a>
+      <a href="/matches" title="Matchs"><span class="nav-icon">&#128481;</span></a>
+      <a href="/tournois" title="Tournois"><span class="nav-icon">&#127942;</span></a>
+      <a href="/boutique" class="active" title="Boutique"><span class="nav-icon">&#128230;</span></a>
+    </aside>
+    <div class="main-wrap">
+      <div class="top-bar">
+        <div class="top-bar-left">
+          <a href="/" class="top-logo"><img src="/images/logo-noir.png" alt="WIT"></a>
+          <div class="search-wrap">
+            <span class="search-icon">&#128269;</span>
+            <input type="text" id="search-input" placeholder="Rechercher un pseudo...">
+          </div>
+        </div>
+        <div class="top-bar-right">
+          <a href="/boutique" class="coins-display">
+            <img src="//images/coin.png" alt="" class="coin-icon">
+            <span id="coins">1000</span>
+          </a>
+          <div id="auth-area"></div>
+        </div>
+      </div>
+      <div id="modal-auth" class="modal-auth">
+        <div class="modal-auth-inner">
+          <button class="modal-close" type="button">&times;</button>
+          <h2>Connexion</h2>
+          <p>Connecte-toi avec ton compte Google pour jouer.</p>
+          <button id="btn-google" class="btn-google">
+            <svg viewBox="0 0 24 24" style="width:20px;height:20px"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            Se connecter avec Google
+          </button>
+        </div>
+      </div>
+      <div id="modal-profile" class="modal-profile">
+        <div class="modal-profile-inner">
+          <button class="modal-close" type="button">&times;</button>
+          <h2>Profil</h2>
+          <div class="profile-header">
+            <img class="profile-pdp" alt="avatar">
+            <div class="profile-info">
+              <div class="profile-pseudo">-</div>
+              <div class="profile-links">
+                <button type="button" class="btn-link-epic">Epic Games</button>
+                <button type="button" class="btn-link-discord">Discord</button>
+              </div>
+            </div>
+          </div>
+          <div class="profile-stats">
+            <div class="profile-stat"><div class="label">Total pieces gagnees</div><div class="value stat-total">0</div></div>
+            <div class="profile-stat"><div class="label">Victoires</div><div class="value stat-wins">0</div></div>
+            <div class="profile-stat"><div class="label">Defaites</div><div class="value stat-losses">0</div></div>
+            <div class="profile-stat"><div class="label">Matchs joues</div><div class="value stat-matches">0</div></div>
+          </div>
+        </div>
+      </div>
+  <main class="shop">
+    <nav class="shop-cats">
+      <button class="shop-tab active" data-cat="piece"><span class="ico">&#128176;</span> Piece</button>
+      <button class="shop-tab" data-cat="snipe"><span class="ico">&#127919;</span> Snipe</button>
+      <button class="shop-tab" data-cat="tag"><span class="ico">&#127991;</span> Tag</button>
+    </nav>
+    <div class="shop-body">
+      <h1 class="font-heading">Boutique</h1>
+      <div class="shop-content active" id="cat-piece">
+        <div class="bundle-grid" id="piece-grid"></div>
+        <div class="gift-section">
+          <h3><span class="gift-icon">&#127873;</span> Gift code</h3>
+          <div class="gift-code-row">
+            <input type="text" id="gift-input" placeholder="Entre ton code cadeau" maxlength="20" />
+            <button type="button" class="btn-gift"><span class="gift-icon">&#127873;</span> Utiliser</button>
+          </div>
+        </div>
+      </div>
+      <div class="shop-content placehold" id="cat-snipe">Snipe - A venir</div>
+      <div class="shop-content placehold" id="cat-tag">Tag - A venir</div>
+    </div>
+  </main>
+    </div>
+  </div>
+  <script src="/config-discord.js"></script>
+  <script src="/auth.js"></script>
+  <script src="/header-init.js"></script>
+  <script src="/gift-codes.js"></script>
+  <script>
+    document.getElementById('coins').textContent = parseFloat(localStorage.getItem('wit-coins') || '1000').toLocaleString('fr-FR', {minimumFractionDigits:1});
+
+    const bundles = [
+      { amount: 5, color: 'blue' },
+      { amount: 10, color: 'red' },
+      { amount: 15, color: 'red' },
+      { amount: 20, color: 'green' },
+      { amount: 25, color: 'green' },
+      { amount: 50, color: 'blue' },
+      { amount: 100, color: 'gold' }
+    ];
+
+    const grid = document.getElementById('piece-grid');
+    bundles.forEach(b => {
+      const card = document.createElement('div');
+      card.className = 'bundle-card ' + b.color;
+      card.innerHTML = `
+        <div class="bundle-label">
+          <img src="//images/coin.png" alt="" class="coin-mini">
+          <span>${b.amount} pieces</span>
+        </div>
+        <div class="chest-img-wrap">
+          <img src="//images/chest.png" alt="" class="chest-img">
+        </div>
+        <button class="btn-buy">${b.amount} ACHETER</button>
+      `;
+      card.querySelector('.btn-buy').addEventListener('click', () => {
+        const c = parseFloat(localStorage.getItem('wit-coins') || '1000');
+        localStorage.setItem('wit-coins', String(c + b.amount));
+        document.getElementById('coins').textContent = (c + b.amount).toLocaleString('fr-FR', {minimumFractionDigits:1});
+        alert('+' + b.amount + ' pieces creditees !');
+      });
+      grid.appendChild(card);
+    });
+
+    document.querySelectorAll('.shop-tab').forEach(t => t.addEventListener('click', () => {
+      document.querySelectorAll('.shop-tab').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.shop-content').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      document.getElementById('cat-' + t.dataset.cat).classList.add('active');
+    }));
+
+    (function giftCode() {
+      const used = JSON.parse(localStorage.getItem('wit-used-codes') || '[]');
+      const btn = document.querySelector('.btn-gift');
+      const input = document.getElementById('gift-input');
+      btn.addEventListener('click', () => {
+        const raw = (input.value || '').trim().toUpperCase();
+        if (!raw) { alert('Entre un code.'); return; }
+        if (used.includes(raw)) { alert('Ce code a deja ete utilise.'); return; }
+        const found = (typeof GIFT_CODES !== 'undefined' ? GIFT_CODES : []).find(c => c.code.toUpperCase() === raw);
+        if (!found) { alert('Code invalide.'); return; }
+        used.push(raw);
+        localStorage.setItem('wit-used-codes', JSON.stringify(used));
+        const c = parseFloat(localStorage.getItem('wit-coins') || '1000');
+        const newVal = c + found.amount;
+        localStorage.setItem('wit-coins', String(newVal));
+        document.getElementById('coins').textContent = newVal.toLocaleString('fr-FR', {minimumFractionDigits:1});
+        input.value = '';
+        alert('+' + found.amount + ' pieces creditees !');
+      });
+    })();
+  </script>
+</body>
+</html>

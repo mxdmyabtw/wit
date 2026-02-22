@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Win is Key - Tournois</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/header-shared.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { overflow-x: hidden; max-width: 100vw; }
+    body { font-family: 'Space Grotesk', sans-serif; background: #0d0f14; color: #f4f4f5; min-height: 100vh; }
+    .font-heading { font-family: 'Orbitron', sans-serif; }
+    .app { display: flex; min-height: 100vh; }
+    .sidebar {
+      position: fixed; left: 0; top: 0; bottom: 0; width: 64px;
+      background: rgba(24, 24, 27, 0.98); border-right: 1px solid #27272a;
+      display: flex; flex-direction: column; align-items: center; padding-top: 1rem; gap: 0.5rem; z-index: 100;
+    }
+    .sidebar .logo-mini { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none; margin-bottom: 1rem; overflow: hidden; }
+    .sidebar .logo-mini img { width: 100%; height: 100%; object-fit: contain; }
+    .sidebar a { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 8px; color: #71717a; text-decoration: none; font-size: 1.25rem; transition: all 0.2s; }
+    .sidebar .nav-icon { font-size: 1.35rem; }
+    .sidebar a:hover { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+    .sidebar a.active { color: #2563eb; background: rgba(37, 99, 235, 0.2); }
+    .main-wrap { flex: 1; margin-left: 64px; min-width: 0; display: flex; flex-direction: column; min-height: 100vh; max-width: calc(100vw - 64px); }
+    main { flex: 1; padding-top: 72px; max-width: min(1280px, calc(100vw - 64px - 2rem)); margin: 0 auto; padding-left: 1rem; padding-right: 1rem; padding-bottom: 2rem; width: 100%; min-width: 0; }
+    .page-header { margin-bottom: 1.5rem; }
+    .page-header h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .page-header p { color: #71717a; font-size: 0.875rem; }
+    .placehold { color: #71717a; padding: 3rem 2rem; text-align: center; font-size: 1.1rem; }
+    .placehold .trophy { font-size: 4rem; margin-bottom: 1rem; opacity: 0.5; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a href="/" class="logo-mini"><img src="/images/logo-noir.png" alt="WIT"></a>
+      <a href="/" title="Accueil"><span class="nav-icon">&#127968;</span></a>
+      <a href="/matches" title="Matchs"><span class="nav-icon">&#128481;</span></a>
+      <a href="/tournois" class="active" title="Tournois"><span class="nav-icon">&#127942;</span></a>
+      <a href="/boutique" title="Boutique"><span class="nav-icon">&#128230;</span></a>
+    </aside>
+    <div class="main-wrap">
+      <div class="top-bar">
+        <div class="top-bar-left">
+          <a href="/" class="top-logo"><img src="/images/logo-noir.png" alt="WIT"></a>
+          <div class="search-wrap">
+            <span class="search-icon">&#128269;</span>
+            <input type="text" id="search-input" placeholder="Rechercher un pseudo...">
+          </div>
+        </div>
+        <div class="top-bar-right">
+          <a href="/boutique" class="coins-display">
+            <img src="/images/coin.png" alt="" class="coin-icon">
+            <span id="coins">1000</span>
+          </a>
+          <div id="auth-area"></div>
+        </div>
+      </div>
+      <div id="modal-auth" class="modal-auth">
+        <div class="modal-auth-inner">
+          <button class="modal-close" type="button">&times;</button>
+          <h2>Connexion</h2>
+          <p>Connecte-toi avec ton compte Google pour jouer.</p>
+          <button id="btn-google" class="btn-google">
+            <svg viewBox="0 0 24 24" style="width:20px;height:20px"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            Se connecter avec Google
+          </button>
+        </div>
+      </div>
+      <div id="modal-profile" class="modal-profile">
+        <div class="modal-profile-inner">
+          <button class="modal-close" type="button">&times;</button>
+          <h2>Profil</h2>
+          <div class="profile-header">
+            <img class="profile-pdp" alt="avatar">
+            <div class="profile-info">
+              <div class="profile-pseudo">-</div>
+              <div class="profile-links">
+                <button type="button" class="btn-link-epic">Epic Games</button>
+                <button type="button" class="btn-link-discord">Discord</button>
+              </div>
+            </div>
+          </div>
+          <div class="profile-stats">
+            <div class="profile-stat"><div class="label">Total pieces gagnees</div><div class="value stat-total">0</div></div>
+            <div class="profile-stat"><div class="label">Victoires</div><div class="value stat-wins">0</div></div>
+            <div class="profile-stat"><div class="label">Defaites</div><div class="value stat-losses">0</div></div>
+            <div class="profile-stat"><div class="label">Matchs joues</div><div class="value stat-matches">0</div></div>
+          </div>
+        </div>
+      </div>
+  <main>
+    <div class="page-header">
+      <h1 class="font-heading">TOURNOIS</h1>
+      <p>Affronte des joueurs et gagne le trophee.</p>
+    </div>
+    <div class="placehold">
+      <div class="trophy">&#127942;</div>
+      <p>Tournois - A venir</p>
+    </div>
+  </main>
+    </div>
+  </div>
+  <script src="/config-discord.js"></script>
+  <script src="/auth.js"></script>
+  <script src="/header-init.js"></script>
+  <script>
+    document.getElementById('coins').textContent = parseFloat(localStorage.getItem('wit-coins') || '1000').toLocaleString('fr-FR', {minimumFractionDigits:1});
+  </script>
+</body>
+</html>

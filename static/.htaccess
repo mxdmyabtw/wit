@@ -1,0 +1,6 @@
+# Apache - URLs propres pour https://winiskey.com
+RewriteEngine On
+RewriteBase /
+RewriteRule ^matches/?$ matches.html [L]
+RewriteRule ^boutique/?$ boutique.html [L]
+RewriteRule ^tournois/?$ tournois.html [L]
