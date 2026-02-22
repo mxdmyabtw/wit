@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Win is Key - Tournois</title>
+  <title>Win is Key - Tournaments</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -38,10 +38,10 @@
   <div class="app">
     <aside class="sidebar">
       <a href="/" class="logo-mini"><img src="/images/logo-noir.png" alt="WIT"></a>
-      <a href="/" title="Accueil"><img src="/images/home.svg" alt="Accueil" class="nav-icon"></a>
-      <a href="/matches" title="Matchs"><img src="/images/matches.svg" alt="Matchs" class="nav-icon"></a>
-      <a href="/tournois" class="active" title="Tournois"><img src="/images/tournament.svg" alt="Tournois" class="nav-icon"></a>
-      <a href="/boutique" title="Boutique"><img src="/images/shop.svg" alt="Boutique" class="nav-icon"></a>
+      <a href="/" title="Home"><img src="/images/home.svg" alt="Home" class="nav-icon"></a>
+      <a href="/matches" title="Matches"><img src="/images/matches.svg" alt="Matches" class="nav-icon"></a>
+      <a href="/tournois" class="active" title="Tournaments"><img src="/images/tournament.svg" alt="Tournaments" class="nav-icon"></a>
+      <a href="/boutique" title="Shop"><img src="/images/shop.svg" alt="Shop" class="nav-icon"></a>
     </aside>
     <div class="main-wrap">
       <div class="top-bar">
@@ -49,7 +49,7 @@
           <a href="/" class="top-logo"><img src="/images/logo-noir.png" alt="WIT"></a>
           <div class="search-wrap">
             <span class="search-icon">&#128269;</span>
-            <input type="text" id="search-input" placeholder="Rechercher un pseudo...">
+            <input type="text" id="search-input" placeholder="Search username...">
           </div>
         </div>
         <div class="top-bar-right">
@@ -63,9 +63,9 @@
       <div id="modal-profile" class="modal-profile">
         <div class="modal-profile-inner">
           <button class="modal-close" type="button">&times;</button>
-          <h2>Profil</h2>
+          <h2>Profile</h2>
           <div class="profile-header">
-            <div class="profile-pdp-wrap" title="Cliquer pour changer">
+            <div class="profile-pdp-wrap" title="Click to change">
               <img class="profile-pdp" alt="avatar">
               <input type="file" accept="image/*" style="display:none">
             </div>
@@ -74,31 +74,32 @@
               <div class="profile-links">
                 <button type="button" class="btn-link-epic"><span class="btn-icon btn-icon-epic" aria-hidden="true"></span>Epic Games</button>
                 <button type="button" class="btn-link-discord"><span class="btn-icon btn-icon-discord" aria-hidden="true"></span>Discord</button>
-                <button type="button" class="btn-logout">Deconnexion</button>
+                <button type="button" class="btn-logout">Logout</button>
               </div>
             </div>
           </div>
           <div class="profile-stats">
-            <div class="profile-stat"><div class="label">Total pieces gagnees</div><div class="value stat-total">0</div></div>
-            <div class="profile-stat"><div class="label">Victoires</div><div class="value stat-wins">0</div></div>
-            <div class="profile-stat"><div class="label">Defaites</div><div class="value stat-losses">0</div></div>
-            <div class="profile-stat"><div class="label">Matchs joues</div><div class="value stat-matches">0</div></div>
+            <div class="profile-stat"><div class="label">Total coins earned</div><div class="value stat-total">0</div></div>
+            <div class="profile-stat"><div class="label">Wins</div><div class="value stat-wins">0</div></div>
+            <div class="profile-stat"><div class="label">Losses</div><div class="value stat-losses">0</div></div>
+            <div class="profile-stat"><div class="label">Matches played</div><div class="value stat-matches">0</div></div>
           </div>
         </div>
       </div>
   <main>
     <div class="page-header">
-      <h1 class="font-heading">TOURNOIS</h1>
-      <p>Affronte des joueurs et gagne le trophee.</p>
+      <h1 class="font-heading">TOURNAMENTS</h1>
+      <p>Face players and win the trophy.</p>
     </div>
     <div class="placehold">
       <div class="trophy">&#127942;</div>
-      <p>Tournois - A venir</p>
+      <p>Tournaments - Coming soon</p>
     </div>
   </main>
     </div>
   </div>
   <script src="/config-discord.js"></script>
+  <script src="/config-firebase.js"></script>
   <script src="/auth.js"></script>
   <script src="/boutique-payment.js"></script>
   <script src="/header-init.js"></script>

@@ -7,11 +7,11 @@
     if (!area) return;
     var user = window.WitAuth && window.WitAuth.getUser();
     if (user) {
-      area.innerHTML = '<div class="user-dropdown" id="user-dd" title="Mon profil"><img class="user-avatar" src="' + (user.pdp || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%2371717a%22%3E%3Cpath d=%22M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z%22/%3E%3C/svg%3E') + '" alt=""><span class="user-pseudo">' + (user.pseudo || '') + '</span></div>';
+      area.innerHTML = '<div class="user-dropdown" id="user-dd" title="My profile"><img class="user-avatar" src="' + (user.pdp || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%2371717a%22%3E%3Cpath d=%22M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z%22/%3E%3C/svg%3E') + '" alt=""><span class="user-pseudo">' + (user.pseudo || '') + '</span></div>';
       var dd = document.getElementById('user-dd');
       if (dd) dd.addEventListener('click', function() { showProfile(user); });
     } else {
-      area.innerHTML = '<button class="btn-login" id="btn-login">Se connecter</button>';
+      area.innerHTML = '<button class="btn-login" id="btn-login">Sign in with Google</button>';
       var btn = document.getElementById('btn-login');
       if (btn) btn.addEventListener('click', function() {
         (window.WitAuth && window.WitAuth.login()).then(function(u) {
@@ -30,7 +30,7 @@
     var m = document.getElementById('modal-profile');
     if (!m) return;
     var s = (window.WitAuth && window.WitAuth.getStats()) || {};
-    m.querySelector('.profile-pseudo').textContent = user.pseudo || 'Inconnu';
+    m.querySelector('.profile-pseudo').textContent = user.pseudo || 'Unknown';
     var pdpImg = m.querySelector('.profile-pdp');
     pdpImg.src = user.pdp || defaultPdpSvg;
     m.querySelector('.stat-total').textContent = (s.totalEarned || 0).toFixed(2);
@@ -61,7 +61,7 @@
           r.readAsDataURL(f);
         };
       }
-      pdpWrap.title = 'Cliquer pour changer la photo';
+      pdpWrap.title = 'Click to change photo';
     }
     m.classList.add('open');
   }
@@ -78,7 +78,7 @@
     if (!q) return;
     var found = window.WitAuth && window.WitAuth.searchUser(q);
     if (found) showProfile(found);
-    else alert('Aucun utilisateur trouve pour "' + q + '"');
+    else alert('No user found for "' + q + '"');
   }
 
   function init() {

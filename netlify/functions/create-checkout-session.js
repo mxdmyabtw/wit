@@ -5,7 +5,7 @@
  */
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-// Prix en centimes (€) par nombre de pièces : 1 pièce = 1 €
+// Price in cents (USD) per coin amount: 1 coin = 1$
 const PRICES = {
   5: 500,     // 5 €
   10: 1000,   // 10 €
@@ -29,7 +29,7 @@ exports.handler = async (event) => {
       return {
         statusCode: 400,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Montant invalide' })
+        body: JSON.stringify({ error: 'Invalid amount' })
       };
     }
 
@@ -37,7 +37,7 @@ exports.handler = async (event) => {
       return {
         statusCode: 400,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Connexion requise pour payer' })
+        body: JSON.stringify({ error: 'Sign in required to pay' })
       };
     }
 
@@ -48,10 +48,10 @@ exports.handler = async (event) => {
       payment_method_types: ['card'],
       line_items: [{
         price_data: {
-          currency: 'eur',
+          currency: 'usd',
           product_data: {
-            name: `${amountNum} pièces Win is Key`,
-            description: 'Pièces virtuelles pour parier sur les matchs',
+            name: `${amountNum} coins Win is Key`,
+            description: 'Virtual coins to bet on matches',
             images: [baseUrl.replace(/\/$/, '') + '/images/coin.png']
           },
           unit_amount: priceCentimes

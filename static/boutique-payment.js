@@ -24,7 +24,7 @@
 
   function updateCoinsDisplay(val) {
     var el = getCoinsEl();
-    if (el) el.textContent = parseFloat(val || 0).toLocaleString('fr-FR', { minimumFractionDigits: 1 });
+    if (el) el.textContent = parseFloat(val || 0).toLocaleString('en-US', { minimumFractionDigits: 1 });
   }
 
   function loadCoinsFromStorage() {
@@ -72,7 +72,7 @@
     var btn = ev && ev.target;
     if (btn) {
       btn.disabled = true;
-      btn.textContent = 'Chargement...';
+      btn.textContent = 'Loading...';
     }
     fetch('/.netlify/functions/create-checkout-session', {
       method: 'POST',
@@ -90,7 +90,7 @@
       .catch(function(err) {
         if (btn) {
           btn.disabled = false;
-          btn.textContent = 'Payer par carte · ' + (PRICES_EUR[amount] || amount) + ' €';
+          btn.textContent = (PRICES_EUR[amount] || amount) + '$ PURCHASE';
         }
       });
   }

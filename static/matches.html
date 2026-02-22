@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Win is Key - Matchs</title>
+  <title>Win is Key - Matches</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -128,10 +128,10 @@
   <div class="app">
     <aside class="sidebar">
       <a href="/" class="logo-mini"><img src="/images/logo-noir.png" alt="WIT"></a>
-      <a href="/" title="Accueil"><img src="/images/home.svg" alt="Accueil" class="nav-icon"></a>
-      <a href="/matches" class="active" title="Matchs"><img src="/images/matches.svg" alt="Matchs" class="nav-icon"></a>
-      <a href="/tournois" title="Tournois"><img src="/images/tournament.svg" alt="Tournois" class="nav-icon"></a>
-      <a href="/boutique" title="Boutique"><img src="/images/shop.svg" alt="Boutique" class="nav-icon"></a>
+      <a href="/" title="Home"><img src="/images/home.svg" alt="Home" class="nav-icon"></a>
+      <a href="/matches" class="active" title="Matches"><img src="/images/matches.svg" alt="Matches" class="nav-icon"></a>
+      <a href="/tournois" title="Tournaments"><img src="/images/tournament.svg" alt="Tournaments" class="nav-icon"></a>
+      <a href="/boutique" title="Shop"><img src="/images/shop.svg" alt="Shop" class="nav-icon"></a>
     </aside>
     <div class="main-wrap">
       <div class="top-bar">
@@ -139,7 +139,7 @@
           <a href="/" class="top-logo"><img src="/images/logo-noir.png" alt="WIT"></a>
           <div class="search-wrap">
             <span class="search-icon">&#128269;</span>
-            <input type="text" id="search-input" placeholder="Rechercher un pseudo...">
+            <input type="text" id="search-input" placeholder="Search username...">
           </div>
         </div>
         <div class="top-bar-right">
@@ -153,9 +153,9 @@
       <div id="modal-profile" class="modal-profile">
         <div class="modal-profile-inner">
           <button class="modal-close" type="button">&times;</button>
-          <h2>Profil</h2>
+          <h2>Profile</h2>
           <div class="profile-header">
-            <div class="profile-pdp-wrap" title="Cliquer pour changer">
+            <div class="profile-pdp-wrap" title="Click to change">
               <img class="profile-pdp" alt="avatar">
               <input type="file" accept="image/*" style="display:none">
             </div>
@@ -164,22 +164,22 @@
               <div class="profile-links">
                 <button type="button" class="btn-link-epic"><span class="btn-icon btn-icon-epic" aria-hidden="true"></span>Epic Games</button>
                 <button type="button" class="btn-link-discord"><span class="btn-icon btn-icon-discord" aria-hidden="true"></span>Discord</button>
-                <button type="button" class="btn-logout">Deconnexion</button>
+                <button type="button" class="btn-logout">Logout</button>
               </div>
             </div>
           </div>
           <div class="profile-stats">
-            <div class="profile-stat"><div class="label">Total pieces gagnees</div><div class="value stat-total">0</div></div>
-            <div class="profile-stat"><div class="label">Victoires</div><div class="value stat-wins">0</div></div>
-            <div class="profile-stat"><div class="label">Defaites</div><div class="value stat-losses">0</div></div>
-            <div class="profile-stat"><div class="label">Matchs joues</div><div class="value stat-matches">0</div></div>
+            <div class="profile-stat"><div class="label">Total coins earned</div><div class="value stat-total">0</div></div>
+            <div class="profile-stat"><div class="label">Wins</div><div class="value stat-wins">0</div></div>
+            <div class="profile-stat"><div class="label">Losses</div><div class="value stat-losses">0</div></div>
+            <div class="profile-stat"><div class="label">Matches played</div><div class="value stat-matches">0</div></div>
           </div>
         </div>
       </div>
   <main>
     <div class="page-header">
       <h1 class="font-heading">LIVE MATCHES</h1>
-      <p>Entre sur l'arene : cree et rejoins des matchs.</p>
+      <p>Enter the arena: create and join matches.</p>
     </div>
 
     <button class="btn-create-match" id="btn-open-modal">Create match</button>
@@ -212,7 +212,7 @@
               <button type="button" class="preset" data-amt="5">5</button>
               <button type="button" class="preset" data-amt="10">10</button>
             </div>
-            <input type="text" name="amount-custom" placeholder="Mise personnalisee (ex: 2,5)" value="0.5">
+            <input type="text" name="amount-custom" placeholder="Custom amount (e.g. 2.5)" value="0.5">
           </div>
           <div class="form-group">
             <label>Game *</label>
@@ -275,8 +275,8 @@
         <div class="mode" id="panel-mode"></div>
         <div class="info" id="panel-info"></div>
         <div class="match-buttons">
-          <button class="btn-victory" id="btn-victory">Victoire</button>
-          <button class="btn-defeat" id="btn-defeat">Defaite</button>
+          <button class="btn-victory" id="btn-victory">Victory</button>
+          <button class="btn-defeat" id="btn-defeat">Defeat</button>
         </div>
         <button class="btn-cancel" id="btn-panel-cancel">Cancel</button>
       </div>
@@ -284,14 +284,15 @@
         <h3>Chat</h3>
         <div class="chat-messages" id="chat-messages"></div>
         <div class="chat-input">
-          <input type="text" id="chat-input" placeholder="Ecrire un message...">
-          <button id="chat-send">Envoyer</button>
+          <input type="text" id="chat-input" placeholder="Type a message...">
+          <button id="chat-send">Send</button>
         </div>
       </div>
     </div>
   </div>
 
   <script src="/config-discord.js"></script>
+  <script src="/config-firebase.js"></script>
   <script src="/auth.js"></script>
   <script src="/boutique-payment.js"></script>
   <script src="/header-init.js"></script>
@@ -315,7 +316,7 @@
     let currentPanelMatchId = null;
 
     function updateUI() {
-      document.getElementById('coins').textContent = getCoins().toLocaleString('fr-FR', { minimumFractionDigits: 1 });
+      document.getElementById('coins').textContent = getCoins().toLocaleString('en-US', { minimumFractionDigits: 1 });
       const matches = getMatches();
       const active = getActive();
       document.getElementById('available-count').textContent = matches.length;
@@ -335,7 +336,7 @@
           <div class="badge">FN | ${m.region} | ${m.platform}</div>
           <div class="mode">1V1 ${m.mode} (${m.loot})</div>
           <div class="info"><span>First To ${m.firstTo}</span></div>
-          <div class="amount">Entry Fee ${parseAmount(m.amount).toLocaleString('fr-FR')} piece(s)</div>
+          <div class="amount">Entry Fee ${parseAmount(m.amount).toLocaleString('en-US')} coin(s)</div>
           <div class="btns">
             <button class="btn-join" data-join data-idx="${i}">Join Match</button>
             <button class="btn-view">View Opponent</button>
@@ -344,10 +345,10 @@
         card.querySelector('[data-join]').addEventListener('click', () => {
           requireLoginAndThen(function() {
           const amt = parseAmount(m.amount);
-          if (getCoins() < amt) { alert('Pas assez de pieces.'); return; }
+          if (getCoins() < amt) { alert('Not enough coins.'); return; }
           setCoins(getCoins() - amt);
           const active = getActive();
-          active.push({ ...m, id: m.id || Date.now(), opponent: 'Joueur ' + (active.length + 1) });
+          active.push({ ...m, id: m.id || Date.now(), opponent: 'Player ' + (active.length + 1) });
           setActive(active);
           const all = getMatches();
           all.splice(i, 1);
@@ -358,7 +359,7 @@
         });
         container.appendChild(card);
       });
-      if (matches.length === 0) container.innerHTML = '<p style="color:#71717a;grid-column:1/-1;">Aucun match disponible.</p>';
+      if (matches.length === 0) container.innerHTML = '<p style="color:#71717a;grid-column:1/-1;">No matches available.</p>';
     }
 
     function renderActive() {
@@ -371,14 +372,14 @@
         card.innerHTML = `
           <div class="badge">FN | ${m.region}</div>
           <div class="mode">1V1 ${m.mode}</div>
-          <div class="info"><span>First To ${m.firstTo}</span><span>vs ${m.opponent || 'En attente'}</span></div>
-          <div class="amount">${parseAmount(m.amount).toLocaleString('fr-FR')} piece(s)</div>
-          <button class="btn-join" data-open-panel data-idx="${i}">Voir le match</button>
+          <div class="info"><span>First To ${m.firstTo}</span><span>vs ${m.opponent || 'Waiting'}</span></div>
+          <div class="amount">${parseAmount(m.amount).toLocaleString('en-US')} coin(s)</div>
+          <button class="btn-join" data-open-panel data-idx="${i}">View match</button>
         `;
         card.querySelector('[data-open-panel]').addEventListener('click', () => openMatchPanel(m.id, i));
         container.appendChild(card);
       });
-      if (active.length === 0) container.innerHTML = '<p style="color:#71717a;grid-column:1/-1;">Aucun match en cours.</p>';
+      if (active.length === 0) container.innerHTML = '<p style="color:#71717a;grid-column:1/-1;">No active matches.</p>';
     }
 
     function openMatchPanel(matchId, idx) {
@@ -412,7 +413,7 @@
       }
       (window.WitAuth && window.WitAuth.login ? window.WitAuth.login() : Promise.resolve(null)).then(function(u) {
         if (u && typeof cb === 'function') cb();
-        else if (!u) alert('Creer un compte ou te connecter pour continuer.');
+        else if (!u) alert('Sign in or create an account to continue.');
       });
     }
 
@@ -430,13 +431,13 @@
     document.getElementById('create-form').addEventListener('submit', (e) => {
       e.preventDefault();
       if (!(window.WitAuth && window.WitAuth.isLoggedIn && window.WitAuth.isLoggedIn())) {
-        alert('Connecte-toi pour creer un match.');
+        alert('Sign in to create a match.');
         return;
       }
       const form = e.target;
       const amount = parseAmount(form.querySelector('[name="amount-custom"]').value);
-      if (amount < 0.5) { alert('Minimum 0.5 piece'); return; }
-      if (getCoins() < amount) { alert('Pas assez de pieces.'); return; }
+      if (amount < 0.5) { alert('Minimum 0.5 coin'); return; }
+      if (getCoins() < amount) { alert('Not enough coins.'); return; }
       const match = {
         id: Date.now(),
         amount,
@@ -472,7 +473,7 @@
 
     document.getElementById('btn-victory').addEventListener('click', () => {
       if (!currentPanelMatchId) return;
-      alert('Victoire ! Les gains ont ete credites.');
+      alert('Victory! Winnings have been credited.');
       const active = getActive();
       const m = active[currentPanelMatchId.idx];
       if (m) {
@@ -505,9 +506,9 @@
       if (!active) return;
       const key = CHAT_KEY + active.id;
       const chat = JSON.parse(localStorage.getItem(key) || '[]');
-      chat.push({ from: 'Moi', msg });
+      chat.push({ from: 'Me', msg });
       localStorage.setItem(key, JSON.stringify(chat));
-      document.getElementById('chat-messages').innerHTML += `<div class="msg"><span class="from">Moi:</span> ${msg}</div>`;
+      document.getElementById('chat-messages').innerHTML += `<div class="msg"><span class="from">Me:</span> ${msg}</div>`;
       input.value = '';
     });
 
