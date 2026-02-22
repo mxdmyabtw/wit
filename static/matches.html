@@ -92,36 +92,97 @@
     .btn-create-modal { width: 100%; padding: 0.75rem; background: #2563eb; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 1rem; }
     .btn-create-modal:hover { background: #3b82f6; }
 
-    /* Match detail panel (active match) */
+    /* Match detail panel (active match) - style BetterPlayerWin */
     .match-panel {
-      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 300; align-items: center; justify-content: center; padding: 1rem;
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 300;
+      align-items: flex-start; justify-content: center; padding: 1rem; overflow-y: auto;
     }
     .match-panel.open { display: flex; }
     .match-panel-inner {
-      background: #18181b; border: 1px solid #27272a; border-radius: 16px; width: 100%; max-width: 900px; max-height: 90vh;
-      display: grid; grid-template-columns: 1fr 280px;
-      overflow: hidden;
+      background: #0d0f14; border: 1px solid #27272a; border-radius: 16px;
+      width: 100%; max-width: 960px; overflow: hidden; position: relative;
     }
-    .match-panel-main { padding: 1.5rem; }
-    .match-panel-main .mode { font-size: 1.25rem; font-weight: 600; color: #f59e0b; margin-bottom: 1rem; }
-    .match-panel-main .info { font-size: 0.875rem; color: #71717a; margin-bottom: 2rem; }
-    .match-buttons { display: flex; gap: 1rem; justify-content: center; margin-bottom: 1rem; }
-    .btn-victory { padding: 1rem 2rem; background: #22c55e; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
-    .btn-victory:hover { background: #16a34a; }
-    .btn-defeat { padding: 1rem 2rem; background: #ef4444; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
-    .btn-defeat:hover { background: #dc2626; }
-    .btn-cancel { display: block; margin: 0 auto; padding: 0.5rem 1.5rem; background: transparent; border: 1px solid #52525b; color: #a1a1aa; border-radius: 8px; cursor: pointer; }
+    .match-panel-hero {
+      background: linear-gradient(135deg, rgba(37,99,235,0.2), rgba(245,158,11,0.1));
+      border-bottom: 1px solid #27272a; padding: 1.5rem 2rem; position: relative;
+    }
+    .match-panel-hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 70% 50%, rgba(245,158,11,0.15) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .match-panel-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: #a1a1aa; font-size: 1.5rem; cursor: pointer; z-index: 2; }
+    .match-panel-close:hover { color: #f4f4f5; }
+    .match-panel-date { font-size: 0.75rem; color: #71717a; margin-bottom: 0.25rem; }
+    .match-panel-title { font-size: 1.5rem; font-weight: 700; color: #f4f4f5; font-family: 'Orbitron', sans-serif; }
+    .match-panel-tags {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;
+    }
+    .match-tag {
+      display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.75rem;
+      background: rgba(39,39,42,0.8); border: 1px solid #3f3f46; border-radius: 6px;
+      font-size: 0.7rem; color: #a1a1aa; text-transform: uppercase;
+    }
+    .match-tag .tag-ico { opacity: 0.8; }
+    .match-panel-stakes {
+      display: flex; align-items: center; gap: 1rem; margin-top: 1rem; font-size: 0.9rem;
+    }
+    .match-panel-stakes span { display: flex; align-items: center; gap: 0.4rem; color: #f59e0b; font-weight: 600; }
+    .match-panel-stakes .stake-arrow { color: #52525b; font-size: 1rem; }
+    .match-progress {
+      display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem;
+      background: rgba(24,24,27,0.6); border-bottom: 1px solid #27272a; gap: 0.5rem;
+    }
+    .match-progress-step {
+      display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: #71717a;
+    }
+    .match-progress-step.done { color: #22c55e; }
+    .match-progress-step.active { color: #f59e0b; font-weight: 600; }
+    .match-progress-step .step-dot { width: 8px; height: 8px; border-radius: 50%; background: #3f3f46; }
+    .match-progress-step.done .step-dot { background: #22c55e; }
+    .match-progress-step.active .step-dot { background: #f59e0b; }
+    .match-progress-line { flex: 1; height: 2px; background: #3f3f46; min-width: 20px; }
+    .btn-share-match {
+      padding: 0.4rem 1rem; font-size: 0.8rem; background: rgba(39,39,42,0.9);
+      border: 1px solid #3f3f46; color: #a1a1aa; border-radius: 6px; cursor: pointer;
+    }
+    .btn-share-match:hover { border-color: #52525b; color: #f4f4f5; }
+    .match-players-row {
+      display: grid; grid-template-columns: 1fr 200px 1fr; gap: 1rem; padding: 1.5rem 2rem;
+      align-items: stretch; min-height: 200px;
+    }
+    .match-player-card {
+      background: rgba(39,39,42,0.5); border: 1px solid #3f3f46; border-radius: 12px;
+      padding: 1.25rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem;
+    }
+    .match-player-card .player-avatar { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; background: #27272a; }
+    .match-player-card .player-name { font-weight: 600; color: #f4f4f5; font-size: 1rem; }
+    .match-player-card .player-status { font-size: 0.75rem; color: #22c55e; }
+    .match-game-info {
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem;
+      background: rgba(24,24,27,0.8); border: 1px solid #27272a; border-radius: 12px; padding: 1rem;
+    }
+    .match-game-info .trophy-ico { font-size: 2.5rem; }
+    .match-game-info .winner-text { font-size: 1rem; font-weight: 700; color: #f59e0b; text-align: center; }
+    .match-game-info .game-status { font-size: 0.85rem; color: #71717a; }
+    .match-buttons { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
+    .match-buttons .btn-victory { padding: 0.6rem 1.25rem; background: #22c55e; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.9rem; }
+    .match-buttons .btn-victory:hover { background: #16a34a; }
+    .match-buttons .btn-defeat { padding: 0.6rem 1.25rem; background: #ef4444; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.9rem; }
+    .match-buttons .btn-defeat:hover { background: #dc2626; }
+    .btn-cancel { padding: 0.4rem 1rem; background: transparent; border: 1px solid #52525b; color: #a1a1aa; border-radius: 6px; cursor: pointer; font-size: 0.8rem; margin-top: 0.5rem; }
     .btn-cancel:hover { border-color: #71717a; color: #f4f4f5; }
     .match-panel-chat {
-      background: #0d0f14; border-left: 1px solid #27272a; padding: 1rem; display: flex; flex-direction: column;
+      background: rgba(13,15,20,0.95); border-top: 1px solid #27272a; padding: 1rem 2rem;
+      display: flex; flex-direction: column; max-height: 200px;
     }
-    .match-panel-chat h3 { font-size: 0.875rem; margin-bottom: 1rem; color: #71717a; }
-    .chat-messages { flex: 1; overflow-y: auto; margin-bottom: 1rem; font-size: 0.875rem; }
-    .chat-messages .msg { margin-bottom: 0.5rem; }
+    .match-panel-chat h3 { font-size: 0.875rem; margin-bottom: 0.75rem; color: #71717a; }
+    .chat-messages { flex: 1; overflow-y: auto; margin-bottom: 0.75rem; font-size: 0.8rem; min-height: 60px; }
+    .chat-messages .msg { margin-bottom: 0.35rem; }
     .chat-messages .msg .from { color: #f59e0b; font-weight: 600; }
     .chat-input { display: flex; gap: 0.5rem; }
-    .chat-input input { flex: 1; padding: 0.5rem; background: #27272a; border: 1px solid #3f3f46; border-radius: 8px; color: #f4f4f5; }
-    .chat-input button { padding: 0.5rem 1rem; background: #2563eb; color: #fff; border: none; border-radius: 8px; cursor: pointer; }
+    .chat-input input { flex: 1; padding: 0.5rem; background: #27272a; border: 1px solid #3f3f46; border-radius: 8px; color: #f4f4f5; font-size: 0.9rem; }
+    .chat-input button { padding: 0.5rem 1rem; background: #2563eb; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85rem; }
   </style>
 </head>
 <body>
@@ -275,17 +336,52 @@
     </div>
   </div>
 
-  <!-- Active match panel (chat + victory/defeat/cancel) -->
+  <!-- Active match panel - style BetterPlayerWin -->
   <div class="match-panel" id="match-panel">
     <div class="match-panel-inner">
-      <div class="match-panel-main">
-        <div class="mode" id="panel-mode"></div>
-        <div class="info" id="panel-info"></div>
-        <div class="match-buttons">
-          <button class="btn-victory" id="btn-victory">Victory</button>
-          <button class="btn-defeat" id="btn-defeat">Defeat</button>
+      <div class="match-panel-hero">
+        <button class="match-panel-close" id="match-panel-close" type="button">&times;</button>
+        <div class="match-panel-date" id="panel-date">Match</div>
+        <h1 class="match-panel-title" id="panel-mode">1V1 Boxfight (Havoc Shotgun)</h1>
+        <div class="match-panel-tags" id="panel-tags"></div>
+        <div class="match-panel-stakes" id="panel-stakes">
+          <span>Entry <img src="/images/coin.png" alt="" style="width:16px;height:16px"> 0.5</span>
+          <span class="stake-arrow">→</span>
+          <span>Prize <img src="/images/coin.png" alt="" style="width:16px;height:16px"> 1.0</span>
         </div>
-        <button class="btn-cancel" id="btn-panel-cancel">Cancel</button>
+      </div>
+      <div class="match-progress">
+        <div class="match-progress-step done"><span class="step-dot"></span>Waiting</div>
+        <div class="match-progress-line"></div>
+        <div class="match-progress-step done"><span class="step-dot"></span>ReadyUp</div>
+        <div class="match-progress-line"></div>
+        <div class="match-progress-step active"><span class="step-dot"></span>Playing</div>
+        <div class="match-progress-line"></div>
+        <div class="match-progress-step"><span class="step-dot"></span>Result</div>
+        <div class="match-progress-line"></div>
+        <div class="match-progress-step"><span class="step-dot"></span>Completed</div>
+        <button class="btn-share-match" id="btn-share-match">Share Match</button>
+      </div>
+      <div class="match-players-row">
+        <div class="match-player-card" id="panel-player-opponent">
+          <img class="player-avatar" id="panel-opp-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2371717a'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" alt="">
+          <div class="player-name" id="panel-opp-name">Opponent</div>
+          <div class="player-status">Ready</div>
+        </div>
+        <div class="match-game-info">
+          <div class="trophy-ico">🏆</div>
+          <div class="game-status" id="panel-game-status">Declare result</div>
+          <div class="match-buttons">
+            <button class="btn-victory" id="btn-victory">Victory</button>
+            <button class="btn-defeat" id="btn-defeat">Defeat</button>
+            <button class="btn-cancel" id="btn-panel-cancel">Cancel</button>
+          </div>
+        </div>
+        <div class="match-player-card" id="panel-player-me">
+          <img class="player-avatar" id="panel-me-avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2371717a'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E" alt="">
+          <div class="player-name" id="panel-me-name">You</div>
+          <div class="player-status">Ready</div>
+        </div>
       </div>
       <div class="match-panel-chat">
         <h3>Chat</h3>
@@ -385,7 +481,7 @@
           setCoins(getCoins() - amt);
           const active = getActive();
           const opponentUser = m.creator || { pseudo: 'Player ' + (active.length + 1), pdp: null, id: null };
-          active.push({ ...m, id: m.id || Date.now(), opponent: opponentUser.pseudo || ('Player ' + (active.length + 1)), opponentUser });
+          active.push({ ...m, id: m.id || Date.now(), createdAt: m.createdAt || Date.now(), opponent: opponentUser.pseudo || ('Player ' + (active.length + 1)), opponentUser });
           setActive(active);
           const all = getMatches();
           all.splice(i, 1);
@@ -418,15 +514,36 @@
       if (active.length === 0) container.innerHTML = '<p style="color:#71717a;grid-column:1/-1;">No active matches.</p>';
     }
 
+    const defaultAvatarSvg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2371717a'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E";
     function openMatchPanel(matchId, idx) {
       const active = getActive()[idx];
       if (!active) return;
       currentPanelMatchId = { id: active.id, idx };
+      const amt = parseAmount(active.amount);
+      const prize = amt * 2;
+      const createdDate = active.createdAt ? new Date(active.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Match';
+      document.getElementById('panel-date').textContent = 'Created ' + createdDate;
       document.getElementById('panel-mode').textContent = `1V1 ${active.mode} (${active.loot})`;
-      document.getElementById('panel-info').textContent = `Region ${active.region} | First To ${active.firstTo} | vs ${active.opponent}`;
+      document.getElementById('panel-tags').innerHTML = `
+        <span class="match-tag"><span class="tag-ico">&#128377;</span> ${active.platform || 'PC'} Platform</span>
+        <span class="match-tag"><span class="tag-ico">&#127760;</span> ${active.region || 'EU'} Region</span>
+        <span class="match-tag"><span class="tag-ico">&#128101;</span> 1V1 Team Size</span>
+        <span class="match-tag"><span class="tag-ico">&#127937;</span> ${active.firstTo || '1'} First to</span>
+      `;
+      document.getElementById('panel-stakes').innerHTML = `
+        <span>Entry <img src="/images/coin.png" alt="" style="width:16px;height:16px"> ${amt.toFixed(1)}</span>
+        <span class="stake-arrow">→</span>
+        <span>Prize <img src="/images/coin.png" alt="" style="width:16px;height:16px"> ${prize.toFixed(1)}</span>
+      `;
+      const opp = active.opponentUser || {};
+      document.getElementById('panel-opp-avatar').src = opp.pdp || defaultAvatarSvg;
+      document.getElementById('panel-opp-name').textContent = opp.pseudo || active.opponent || 'Opponent';
+      const me = (window.WitAuth && window.WitAuth.getUser()) || {};
+      document.getElementById('panel-me-avatar').src = me.pdp || defaultAvatarSvg;
+      document.getElementById('panel-me-name').textContent = me.pseudo || 'You';
+      document.getElementById('panel-game-status').textContent = 'Declare result';
       const chat = JSON.parse(localStorage.getItem(CHAT_KEY + active.id) || '[]');
-      const chatEl = document.getElementById('chat-messages');
-      chatEl.innerHTML = chat.map(x => `<div class="msg"><span class="from">${x.from}:</span> ${x.msg}</div>`).join('');
+      document.getElementById('chat-messages').innerHTML = chat.map(x => `<div class="msg"><span class="from">${x.from}:</span> ${x.msg}</div>`).join('');
       document.getElementById('match-panel').classList.add('open');
     }
 
@@ -465,6 +582,7 @@
       const creator = { id: user.id, pseudo: user.pseudo || 'Creator', pdp: user.pdp || null };
       const match = {
         id: Date.now(),
+        createdAt: Date.now(),
         amount,
         game: form.game.value,
         region: form.region.value,
@@ -484,6 +602,16 @@
       updateUI();
     });
 
+    document.getElementById('match-panel-close').addEventListener('click', closeMatchPanel);
+    document.getElementById('match-panel').addEventListener('click', function(e) {
+      if (e.target === document.getElementById('match-panel')) closeMatchPanel();
+    });
+    document.getElementById('btn-share-match').addEventListener('click', function() {
+      var url = window.location.origin + '/matches';
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function() { alert('Lien copié !'); });
+      } else { prompt('Copiez ce lien:', url); }
+    });
     document.getElementById('btn-panel-cancel').addEventListener('click', () => {
       if (!currentPanelMatchId) return;
       const active = getActive();
