@@ -1,0 +1,5 @@
+# Site statique Win is Key - pas de build
+[build]
+  base = "static"
+  publish = "."
+  command = "echo 'Static site - no build'"
