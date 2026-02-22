@@ -80,3 +80,33 @@
 .profile-stat { padding: 0.75rem; background: rgba(39, 39, 42, 0.6); border-radius: 8px; border: 1px solid #27272a; }
 .profile-stat .label { font-size: 0.7rem; color: #71717a; margin-bottom: 0.25rem; }
 .profile-stat .value { font-size: 1.1rem; font-weight: 700; color: #f59e0b; }
+
+/* Modal Pseudo - centre ecran */
+.modal-pseudo {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 600;
+  align-items: center; justify-content: center; padding: 1rem;
+}
+.modal-pseudo.open { display: flex; }
+.modal-pseudo-inner {
+  background: #18181b; border: 1px solid #27272a; border-radius: 16px;
+  width: 100%; max-width: 360px; padding: 2rem;
+  display: flex; flex-direction: column; align-items: center; gap: 1.5rem;
+}
+.modal-pseudo-title {
+  font-size: 1.25rem; font-weight: 700; color: #f4f4f5; text-align: center; margin: 0;
+}
+.modal-pseudo-form {
+  width: 100%; display: flex; flex-direction: column; gap: 0.75rem;
+}
+.modal-pseudo-form input {
+  width: 100%; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid #3f3f46;
+  background: rgba(39, 39, 42, 0.9); color: #f4f4f5; font-size: 1rem; outline: none;
+}
+.modal-pseudo-form input:focus { border-color: #f59e0b; }
+.modal-pseudo-form input::placeholder { color: #71717a; }
+.modal-pseudo-form button {
+  width: 100%; padding: 0.75rem 1rem; border: none; border-radius: 8px;
+  background: linear-gradient(135deg, #f59e0b, #d97706); color: #0d0f14;
+  font-weight: 700; font-size: 1rem; cursor: pointer; transition: opacity 0.2s;
+}
+.modal-pseudo-form button:hover { opacity: 0.9; }

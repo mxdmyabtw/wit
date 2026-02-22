@@ -1,7 +1,7 @@
 /**
- * Auth & Profils - Firebase Auth (Google) ou simulation
- * Si WIT_FIREBASE_CONFIG est defini et valide, utilise Firebase Auth.
- * Sinon fallback sur simulation pour dev.
+ * Auth & Profils - Firebase Auth (Google) puis choix du pseudo
+ * 1. Connexion avec compte Google (popup)
+ * 2. Modale "Veuillez choisir un pseudo" au centre
  * ATTENTION: Le token Discord ne doit JAMAIS etre dans le frontend - le bot tourne cote serveur
  */
 
@@ -11,6 +11,7 @@
 
   let firebaseAuth = null;
   let firebaseInitialized = false;
+  let modalPseudoEl = null;
 
   function initFirebase() {
     if (firebaseInitialized) return firebaseAuth;
@@ -32,16 +33,13 @@
     return !!initFirebase();
   }
 
-  function firebaseUserToWitUser(fbUser) {
+  function firebaseUserToBaseUser(fbUser) {
     if (!fbUser) return null;
-    const email = fbUser.email || '';
-    const displayName = fbUser.displayName || email.split('@')[0] || 'Joueur';
-    const photoURL = fbUser.photoURL || null;
     return {
       id: fbUser.uid,
-      email: email,
-      pseudo: displayName.slice(0, 20),
-      pdp: photoURL,
+      email: fbUser.email || '',
+      pseudo: null,
+      pdp: fbUser.photoURL || null,
       epicLinked: false,
       discordLinked: false
     };
@@ -90,22 +88,92 @@
     saveStats(s);
   }
 
+  function showPseudoModal(baseUser) {
+    return new Promise(function(resolve) {
+      if (modalPseudoEl && modalPseudoEl.parentNode) {
+        modalPseudoEl.parentNode.removeChild(modalPseudoEl);
+      }
+      modalPseudoEl = document.createElement('div');
+      modalPseudoEl.id = 'modal-pseudo';
+      modalPseudoEl.className = 'modal-pseudo';
+      var suggestion = (baseUser && baseUser.email) ? baseUser.email.split('@')[0] : '';
+      modalPseudoEl.innerHTML = '<div class="modal-pseudo-inner">' +
+        '<h2 class="modal-pseudo-title">Veuillez choisir un pseudo</h2>' +
+        '<div class="modal-pseudo-form">' +
+        '<input type="text" id="pseudo-input" placeholder="Ton pseudo" maxlength="20" value="' + (suggestion || '').replace(/"/g, '&quot;') + '" autocomplete="username">' +
+        '<button type="button" id="pseudo-submit">Valider</button>' +
+        '</div></div>';
+      document.body.appendChild(modalPseudoEl);
+      modalPseudoEl.classList.add('open');
+
+      var input = document.getElementById('pseudo-input');
+      var btn = document.getElementById('pseudo-submit');
+
+      function finish() {
+        var pseudo = (input && input.value || '').trim().slice(0, 20);
+        if (!pseudo) {
+          alert('Choisis un pseudo.');
+          return;
+        }
+        var u = Object.assign({}, baseUser || {}, { pseudo: pseudo });
+        modalPseudoEl.classList.remove('open');
+        setTimeout(function() {
+          if (modalPseudoEl.parentNode) modalPseudoEl.parentNode.removeChild(modalPseudoEl);
+          modalPseudoEl = null;
+        }, 300);
+        resolve(u);
+      }
+
+      if (btn) btn.addEventListener('click', finish);
+      if (input) {
+        input.focus();
+        input.addEventListener('keypress', function(e) { if (e.key === 'Enter') finish(); });
+      }
+    });
+  }
+
   function loginGoogleSimulated() {
-    var pseudo = 'Invite_' + Math.random().toString(36).slice(2, 8);
-    var u = {
+    var baseUser = {
       id: 'g_' + Date.now(),
       email: '',
-      pseudo: pseudo,
+      pseudo: null,
       pdp: null,
       epicLinked: false,
       discordLinked: false
     };
-    setUser(u);
-    initStats();
-    return Promise.resolve(u);
+    return showPseudoModal(baseUser).then(function(u) {
+      setUser(u);
+      initStats();
+      return u;
+    });
   }
 
   function loginGoogle() {
+    if (useFirebase()) {
+      var auth = initFirebase();
+      var provider = new firebase.auth.GoogleAuthProvider();
+      return auth.signInWithPopup(provider)
+        .then(function(result) {
+          var baseUser = firebaseUserToBaseUser(result.user);
+          var stored = getUser();
+          if (stored && stored.id === baseUser.id && stored.pseudo) {
+            setUser(stored);
+            initStats();
+            return stored;
+          }
+          return showPseudoModal(baseUser).then(function(u) {
+            setUser(u);
+            initStats();
+            return u;
+          });
+        })
+        .catch(function(err) {
+          console.error('Firebase signIn error:', err);
+          if (err.code === 'auth/popup-closed-by-user') return null;
+          alert('Connexion Google echouee: ' + (err.message || 'Erreur inconnue'));
+          return null;
+        });
+    }
     return loginGoogleSimulated();
   }
 
@@ -125,13 +193,23 @@
     getStats: getStats,
     initStats: initStats,
     addMatchResult: addMatchResult,
+    showPseudoModal: showPseudoModal,
     onAuthStateChanged: function(callback) {
       if (useFirebase()) {
         initFirebase().onAuthStateChanged(function(fbUser) {
           if (fbUser) {
-            var u = firebaseUserToWitUser(fbUser);
-            setUser(u);
-            callback(u);
+            var stored = getUser();
+            if (stored && stored.id === fbUser.uid && stored.pseudo) {
+              setUser(stored);
+              callback(stored);
+              return;
+            }
+            var baseUser = firebaseUserToBaseUser(fbUser);
+            showPseudoModal(baseUser).then(function(u) {
+              setUser(u);
+              initStats();
+              callback(u);
+            });
           } else {
             setUser(null);
             callback(null);
@@ -159,8 +237,20 @@
 
   if (useFirebase()) {
     initFirebase().onAuthStateChanged(function(fbUser) {
-      if (fbUser) setUser(firebaseUserToWitUser(fbUser));
-      else setUser(null);
+      if (fbUser) {
+        var stored = getUser();
+        if (stored && stored.id === fbUser.uid && stored.pseudo) {
+          setUser(stored);
+        } else {
+          var baseUser = firebaseUserToBaseUser(fbUser);
+          showPseudoModal(baseUser).then(function(u) {
+            setUser(u);
+            initStats();
+          });
+        }
+      } else {
+        setUser(null);
+      }
     });
   }
 })();

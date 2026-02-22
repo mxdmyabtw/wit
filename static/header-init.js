@@ -11,8 +11,13 @@
       var dd = document.getElementById('user-dd');
       if (dd) dd.addEventListener('click', function() { showProfile(user); });
     } else {
-      (window.WitAuth && window.WitAuth.loginGoogle()).then(function() { renderAuthArea(); });
-      area.innerHTML = '';
+      area.innerHTML = '<button class="btn-login" id="btn-login">Se connecter</button>';
+      var btn = document.getElementById('btn-login');
+      if (btn) btn.addEventListener('click', function() {
+        (window.WitAuth && window.WitAuth.loginGoogle()).then(function(u) {
+          if (u) renderAuthArea();
+        });
+      });
     }
   }
 
@@ -51,7 +56,11 @@
   }
 
   function init() {
-    renderAuthArea();
+    if (window.WitAuth && window.WitAuth.onAuthStateChanged) {
+      window.WitAuth.onAuthStateChanged(renderAuthArea);
+    } else {
+      renderAuthArea();
+    }
     var searchInp = document.getElementById('search-input');
     if (searchInp) {
       searchInp.addEventListener('keypress', function(e) { if (e.key === 'Enter') onSearch(); });
